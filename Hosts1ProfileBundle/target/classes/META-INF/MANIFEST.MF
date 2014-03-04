@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Export-Package: com.francetelecom.admindm.hosts1profile;uses:="com.fra
+ ncetelecom.admindm.hosts1profile.exceptions,com.francetelecom.admindm
+ .model,com.francetelecom.admindm.api,org.osgi.framework,com.francetel
+ ecom.admindm.hosts1profile.model,com.francetelecom.admindm.soap",com.
+ francetelecom.admindm.hosts1profile.exceptions,com.francetelecom.admi
+ ndm.hosts1profile.model;uses:="com.francetelecom.admindm.api,com.fran
+ cetelecom.admindm.hosts1profile,com.francetelecom.admindm.model,com.f
+ rancetelecom.admindm.soap,com.francetelecom.admindm.com"
+Built-By: JZBV7415
+Tool: Bnd-0.0.311
+Bundle-Name: Hosts1ProfileBundle
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: FT/OLNC/OLPS/SMA/DM2E/MAAD
+Build-Jdk: 1.7.0_45
+Bundle-Version: 1.1.5.SNAPSHOT
+Bnd-LastModified: 1393949773949
+Bundle-ManifestVersion: 2
+Bundle-Activator: com.francetelecom.admindm.hosts1profile.Activator
+Bundle-Description: TR181-2-6, Hosts:1 Profile Implementation
+Import-Package: com.francetelecom.admindm.api,com.francetelecom.admind
+ m.com,com.francetelecom.admindm.inform,com.francetelecom.admindm.mode
+ l,com.francetelecom.admindm.soap,org.kxml2.kdom,org.osgi.framework;ve
+ rsion="1.3",org.osgi.service.log;version="1.3",org.xmlpull.v1
+Bundle-SymbolicName: com.francetelecom.acse.modus.Hosts1ProfileBundle
+

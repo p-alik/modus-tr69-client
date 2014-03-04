@@ -1,0 +1,120 @@
+﻿ImportScript("TR69/InformsHelper");
+ImportScript("TR69/getParameters");
+
+// see TR69/ManageBundle.
+
+function main(workflow, event) {
+    // event has type: com.netopia.nbbs.task.DeviceEvent
+    var device = event.device;
+    var messages = event.getParameter("messages");
+
+    print("OrangeLabs_tasks_DUStateChangeCompleteNotification_20130227.txt.js");
+
+    for (var key in messages) {
+        var msg = messages[key];
+
+        print("AZERTY-DEBUG: msg: "+msg);
+
+        if (msg instanceof TR69.DUStateChangeCompleteRequest) {
+            // msg has type: com.netopia.nbbs.tr69.msg.DUStateChangeCompleteRequest
+            print("QSDFGH-DEBUG: we got a DUStateChangeCompleteRequest! msg: "+msg+", msg cmdkey='"+msg.getCommandKey()+"'");
+
+            var results = msg.getResults();
+            print("DUStateChangeCompleted results:"+results);
+            for(var key2 in results) {
+                var result = results[key2];
+                // E.g. Examining DUStateChangeCompleted result:OpResultStruct:
+                // [,uuid=UUID_value,deploymentUnitRef=32,version=1.0.0,currentState=Installed,
+                // resolved=false,executionUnitRefList=There is no way to get this info.,
+                // startTime=2013-02-27T14:23:35Z,completeTime=2013-02-27T14:23:35Z,Fault=null]
+                
+                // E.g. Examining DUStateChangeCompleted result:OpResultStruct:
+                // [,uuid=UUID_value,deploymentUnitRef=null,version=null,currentState=Failed,
+                // resolved=false,executionUnitRefList=There is no way to get this info.,
+                // startTime=2013-02-27T14:40:56Z,completeTime=2013-02-27T14:40:56Z,Fault=null]
+                print("Examining DUStateChangeCompleted result:"+result);
+                
+                print("DUStateChangeCompleted message received with uuid:"+result.uuid);
+                // The following commented code does not work: sometimes result.fault is null...
+                //if(result.fault.faultCode != TR69.DeploymentUnitFaultCode.NO_FAULT) {
+                //    print("DUStateChangeCompleted indicates an error. FaultCode:"+result.fault.faultCode+", FaultString:"+result.fault.faultString);
+                //    response.status = "FAILED";
+                //    response.faultCode = result.fault.faultCode;
+        	//    response.comment = result.fault.faultString;
+                //} else {
+                // result.currentState can be one of Installed, Failed or Uninstalled  
+                if(result.currentState == "Installed") {
+                
+                    // according to the specification: Installed can mean: successful install, successful update, failed update, and failed uninstall.
+                
+                    print("DUStateChangeCompleted message indicates successful install, or update. Additional non-saved information follows:");
+                    print("DUStateChangeCompleted, DeploymentUnitRef:"+result.deploymentUnitRef);
+                    print("DUStateChangeCompleted, Version:"+result.version);
+                    print("DUStateChangeCompleted, executionUnitRefList:"+result.executionUnitRefList);
+                    print("DUStateChangeCompleted, StartTime:"+result.startTime);
+                    print("DUStateChangeCompleted, CompleteTime:"+result.completeTime);
+                
+                    var faultCode;
+                    var faultString;
+                    if(result.fault != null){
+                        faultCode = result.fault.faultCode;
+                        faultString = result.fault.faultString;
+                        //response.comment = response.comment+", "+result.fault.faultString;
+                    }
+                
+                    var params = result.parameterMap;
+                    var p="id:"+device.id+";model:"+device.model+";serial:"+device.serialNum+";params:"+params+
+                    ";uuid:"+result.uuid+";deploymentUnitRef:"+result.deploymentUnitRef+";version:"+result.version+";resolved:"+result.resolved+
+                    ";executionUnitRefList:"+result.executionUnitRefList+";startTime:"+result.startTime+";completeTime:"+result.completeTime+
+                    ";currentState:"+result.currentState+";fault:"+result.fault+";result.faultCode:"+faultCode+";result.faultString:"+faultString+
+                    ";extra-comment:"+"DUStateChangeCompleted message indicates successful install, or update."+
+                    ";msg.getCommandKey():"+msg.getCommandKey();
+                    JMS.services['NotificationDUStateChangeComplete'].post(p);	
+                
+                } else if(result.currentState == "Failed") {
+                    print("DUStateChangeCompleted message indicates failure. result.currentState="+result.currentState);
+
+                    var faultCode;
+                    var faultString;
+                    if(result.fault != null){
+                        faultCode = result.fault.faultCode;
+                        faultString = result.fault.faultString;
+                        //response.comment = response.comment+", "+result.fault.faultString;
+                    }
+                       
+                    var params = result.parameterMap;
+                    var p="id:"+device.id+";model:"+device.model+";serial:"+device.serialNum+";params:"+params+
+                    ";uuid:"+result.uuid+";deploymentUnitRef:"+result.deploymentUnitRef+";version:"+result.version+";resolved:"+result.resolved+
+                    ";executionUnitRefList:"+result.executionUnitRefList+";startTime:"+result.startTime+";completeTime:"+result.completeTime+
+                    ";currentState:"+result.currentState+";fault:"+result.fault+";result.faultCode:"+faultCode+";result.faultString:"+faultString+
+                    ";extra-comment:"+"DUStateChangeCompleted message indicates failure."+";msg.getCommandKey():"+msg.getCommandKey();
+                    JMS.services['NotificationDUStateChangeComplete'].post(p);	
+                
+                } else if(result.currentState == "Uninstalled"){
+                    print("DUStateChangeCompleted message indicates successful uninstall. result.currentState="+result.currentState);
+                    
+                    var faultCode;
+                    var faultString;
+                    if(result.fault != null){
+                        faultCode = result.fault.faultCode;
+                        faultString = result.fault.faultString;
+                        //response.comment = response.comment+", "+result.fault.faultString;
+                    }
+                     
+                    var params = result.parameterMap;
+                    var p="id:"+device.id+";model:"+device.model+";serial:"+device.serialNum+";params:"+params+
+                    ";uuid:"+result.uuid+";deploymentUnitRef:"+result.deploymentUnitRef+";version:"+result.version+";resolved:"+result.resolved+
+                    ";executionUnitRefList:"+result.executionUnitRefList+";startTime:"+result.startTime+";completeTime:"+result.completeTime+
+                    ";currentState:"+result.currentState+";fault:"+result.fault+";result.faultCode:"+faultCode+";result.faultString:"+faultString+
+                    ";extra-comment:"+"DUStateChangeCompleted message indicates successful uninstall."+
+                    ";msg.getCommandKey():"+msg.getCommandKey();
+                    JMS.services['NotificationDUStateChangeComplete'].post(p);	
+                    
+                } else {
+                    // Mystery value?
+                    print("DUStateChangeCompleted message current state not installed but:"+result.currentState+" for uuid:"+result.uuid);
+                }
+            }
+        }
+    }    
+}

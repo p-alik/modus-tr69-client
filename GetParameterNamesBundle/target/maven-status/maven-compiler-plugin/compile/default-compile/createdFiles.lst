@@ -1,0 +1,5 @@
+com\francetelecom\admindm\getParameterNames\GetParameterNamesResponseEncoder.class
+com\francetelecom\admindm\getParameterNames\Activator.class
+com\francetelecom\admindm\getParameterNames\GetParameterNamesDecoder.class
+com\francetelecom\admindm\getParameterNames\GetParameterNamesResponse.class
+com\francetelecom\admindm\getParameterNames\GetParameterNames.class

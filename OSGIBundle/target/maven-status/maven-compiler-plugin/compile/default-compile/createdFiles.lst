@@ -1,0 +1,7 @@
+com\francetelecom\admindm\osgi\OSGIBundleListener.class
+com\francetelecom\admindm\osgi\BundleInfo.class
+com\francetelecom\admindm\osgi\BundleNumberOfEntriesUpdater.class
+com\francetelecom\admindm\osgi\Activator.class
+com\francetelecom\admindm\osgi\StateModifier.class
+com\francetelecom\admindm\osgi\SequenceParameter.class
+com\francetelecom\admindm\osgi\ParameterDataServiceListener.class

@@ -1,0 +1,5 @@
+com\francetelecom\admindm\deleteObject\DeleteObjectResponse.class
+com\francetelecom\admindm\deleteObject\Activator.class
+com\francetelecom\admindm\deleteObject\DeleteObjectResponseEncoder.class
+com\francetelecom\admindm\deleteObject\DeleteObject.class
+com\francetelecom\admindm\deleteObject\DeleteObjectDecoder.class

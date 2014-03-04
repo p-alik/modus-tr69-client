@@ -1,0 +1,87 @@
+﻿// param device is just needed when executing this script 
+// in the debug tab. REMOVE IT when calling the capability from Java!
+// function changeDUStateInstall(device, changeDUStateInstall) {
+function changeDUStateInstall(changeDUStateInstall) {
+
+	print("changeDUStateInstall(changeDUStateInstall.URL="+changeDUStateInstall.URL
+	+",changeDUStateInstall.UUID="+changeDUStateInstall.UUID
+	+",changeDUStateInstall.Username="+changeDUStateInstall.Username
+	+",changeDUStateInstall.Password="+changeDUStateInstall.Password
+	+",changeDUStateInstall.ExecutionEnvRef="+changeDUStateInstall.ExecutionEnvRef
+	+")");
+
+	var device=this;
+	
+	var req = new TR69.ChangeDUStateRequest();
+	req.commandKey = device.id+"_TODO DEFINE THE COMMANDKEY!_INSTALL";
+	print("req.commandKey="+req.commandKey);
+	req.cwmpVersion = TR69.CwmpVersion.CWMP_1_2;
+	var operations = req.getOperations();
+	
+	var op = new TR69.InstallOpStruct();
+	
+	op.url = changeDUStateInstall.URL;
+	// TODO in order to set the UUID properly we would need to know the Name & Vendor which will end up
+	// in the DeploymentUnit.{i}. portion of the Device tree after installation. Because we don't know this
+	// information we must not set the UUID. Could we get this information from the Bundle JAR?
+	//
+	// Antonin: Yes, this info can be found in bundle JAR. That's why this is one of this method param.
+	op.uuid = changeDUStateInstall.UUID;
+
+	// Note: InstallOpStruct also has username and password attributes which are currently unused.
+	op.username = changeDUStateInstall.Username;
+	op.password = changeDUStateInstall.Password;
+	
+	// Note: we are not currently specifying the ExecutionEnvironment to use. According to TR-069am3:
+	
+	// ExecutionEnvRef: If this string is either not provided or sent in as an empty string, the CPE MUST
+	// choose which Execution Environment to use.
+	op.executionEnvRef = changeDUStateInstall.ExecutionEnvRef;
+	
+	operations.add(op);
+	
+	device.log('Let s execute: changeDUStateInstall', changeDUStateInstall.UUID);
+	var resp;
+	var con;
+	try {
+		print("Creating connection to device: "+device);
+		con = TR69.createConnection(device);
+			
+		print("Sending request: "+req);
+		resp = con.sendRequest(req);
+		
+		print("Response from ChangeDUStateRequest (installation) is:"+resp);
+			
+		con.clearKeepAlive();    
+		if( resp instanceof TR69.ChangeDUStateResponse ) {
+		    if( resp.status == TR69.DownloadStatus.NOT_COMPLETED ) {
+		        device.log('software.installation.inprogress',changeDUStateInstall.UUID);
+		    } else {
+		    	print("Should be success!!! I.e. the device/CPE correctly gets the operation(s). "
+					+"It must now execute them...");
+		        device.log('software.installation.success', changeDUStateInstall.UUID);
+		    }
+		} else if ( resp instanceof TR69.SOAPFault ) {
+			device.log('software.installation.error', changeDUStateInstall.UUID, resp);
+			throw resp;
+		} else {
+		    device.log('software.installation.error', changeDUStateInstall.UUID, resp);
+		    throw resp;
+		}
+	} finally {
+		con.close();
+	}
+
+	return "executed: changeDUStateInstall: "+changeDUStateInstall+", resp: "+resp;
+
+}
+
+// Uncomment the following when testing in debug tab.
+//var input ={};
+//input['URL']='http://.../mybundle.jar';
+//input['UUID']='uuid';
+//input['Username']='username';
+//input['Password']='password';
+//input['ExecutionEnvRef']='executionenvref';
+//print(input );
+//print(changeDUStateInstall(this, input));

@@ -1,0 +1,34 @@
+Manifest-Version: 1.0
+Export-Package: com.francetelecom.admindm.sm_baseline1profile.model;us
+ es:="com.francetelecom.admindm.model,com.francetelecom.admindm.api,or
+ g.osgi.framework,com.francetelecom.admindm.soap,com.francetelecom.adm
+ indm.sm_baseline1profile.utils,com.francetelecom.admindm.sm_baseline1
+ profile",com.francetelecom.admindm.sm_baseline1profile.exceptions,com
+ .francetelecom.admindm.sm_baseline1profile.utils;uses:="com.francetel
+ ecom.admindm.sm_baseline1profile.model,com.francetelecom.admindm.mode
+ l,com.francetelecom.admindm.api,org.osgi.framework,com.francetelecom.
+ admindm.soap,com.francetelecom.admindm.sm_baseline1profile",com.franc
+ etelecom.admindm.sm_baseline1profile;uses:="com.francetelecom.admindm
+ .sm_baseline1profile.model,com.francetelecom.admindm.sm_baseline1prof
+ ile.exceptions,com.francetelecom.admindm.model,org.osgi.framework,com
+ .francetelecom.admindm.api,com.francetelecom.admindm.soap,com.francet
+ elecom.admindm.sm_baseline1profile.utils"
+Built-By: JZBV7415
+Tool: Bnd-0.0.311
+Bundle-Name: SM_Baseline1ProfileBundle
+Created-By: Apache Maven Bundle Plugin
+Bundle-Vendor: FT/OLNC/OLPS/SMA/DM2E/MAAD
+Build-Jdk: 1.7.0_45
+Bundle-Version: 1.1.5.SNAPSHOT
+Bnd-LastModified: 1393949774232
+Bundle-ManifestVersion: 2
+Bundle-Activator: com.francetelecom.admindm.sm_baseline1profile.Activa
+ tor
+Bundle-Description: TR181-2-6, SM_Baseline:1 Profile Implementation
+Import-Package: com.francetelecom.admindm.api,com.francetelecom.admind
+ m.com,com.francetelecom.admindm.inform,com.francetelecom.admindm.mode
+ l,com.francetelecom.admindm.soap,org.kxml2.kdom,org.osgi.framework;ve
+ rsion="1.3",org.osgi.service.log;version="1.3",org.xmlpull.v1
+Bundle-SymbolicName: com.francetelecom.acse.modus.SM_Baseline1ProfileB
+ undle
+

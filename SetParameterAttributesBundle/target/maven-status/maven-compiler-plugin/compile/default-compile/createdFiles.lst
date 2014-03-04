@@ -1,0 +1,6 @@
+com\francetelecom\admindm\setParameterAttributes\Activator.class
+com\francetelecom\admindm\setParameterAttributes\SetParameterAttributesDecoder.class
+com\francetelecom\admindm\setParameterAttributes\SetParameterAttributes.class
+com\francetelecom\admindm\setParameterAttributes\SetParameterAttributesResponseEncoder.class
+com\francetelecom\admindm\setParameterAttributes\Save.class
+com\francetelecom\admindm\setParameterAttributes\SetParameterAttributesResponse.class

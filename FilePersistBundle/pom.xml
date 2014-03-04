@@ -1,0 +1,73 @@
+<!--
+/**
+ * Product Name : Modus TR-069 Orange
+ *
+ * Copyright c 2014 Orange
+ *
+ * This software is distributed under the Apache License, Version 2.0
+ * (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0 or see the "license.txt" file for
+ * more details
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Author: Olivier Beyler - Orange
+ */
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.francetelecom.acse.modus</groupId>
+		<artifactId>modus-clientTR69</artifactId>
+		<version>1.1.5-SNAPSHOT</version>
+	</parent>
+	<artifactId>FilePersistBundle</artifactId>
+	<name>${project.artifactId}</name>
+	<packaging>bundle</packaging>
+	<description>persistance TR69 Client API</description>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<extensions>true</extensions>
+				<version>2.0.0</version>
+				<configuration>
+					<instructions>
+						<Import-Package>
+							org.osgi.framework,
+							com.francetelecom.admindm.api,
+							com.francetelecom.admindm.persist
+						</Import-Package>
+						<Export-Package>
+							com.francetelecom.admindm.persist.file
+						</Export-Package>
+						<!-- <Service-Component> OSGI-INF/component.xml; OSGI-INF/eventComponent.xml 
+							</Service-Component> -->
+						<Bundle-Activator>com.francetelecom.admindm.persist.file.Activator</Bundle-Activator>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>com.francetelecom.acse.modus</groupId>
+			<artifactId>IPersistBundle</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.francetelecom.acse.modus</groupId>
+			<artifactId>TR69ClientAPI</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+	</dependencies>
+</project>

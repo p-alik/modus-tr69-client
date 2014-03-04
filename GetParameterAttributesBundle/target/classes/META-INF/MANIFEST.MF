@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Export-Package: com.francetelecom.admindm.getParameterAttributes;uses:
+ ="org.osgi.framework,com.francetelecom.admindm.api,com.francetelecom.
+ admindm.model,com.francetelecom.admindm.soap,org.kxml2.kdom"
+Built-By: JZBV7415
+Tool: Bnd-0.0.311
+Bundle-Name: GetParameterAttributesBundle
+Created-By: Apache Maven Bundle Plugin
+Build-Jdk: 1.7.0_45
+Bundle-Version: 1.1.5.SNAPSHOT
+Bnd-LastModified: 1393949734653
+Bundle-ManifestVersion: 2
+Bundle-Activator: com.francetelecom.admindm.getParameterAttributes.Act
+ ivator
+Bundle-Description: RPCMethod du client TR69
+Import-Package: com.francetelecom.admindm.api,com.francetelecom.admind
+ m.model,com.francetelecom.admindm.soap,org.kxml2.kdom,org.osgi.framew
+ ork;version="1.3",org.osgi.service.log;version="1.3",org.xmlpull.v1
+Bundle-SymbolicName: com.francetelecom.acse.modus.GetParameterAttribut
+ esBundle
+

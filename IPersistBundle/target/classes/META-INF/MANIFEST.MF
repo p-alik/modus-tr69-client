@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Export-Package: com.francetelecom.admindm.persist;uses:="org.osgi.fram
+ ework"
+Built-By: JZBV7415
+Tool: Bnd-0.0.311
+Bundle-Name: IPersistBundle
+Created-By: Apache Maven Bundle Plugin
+Build-Jdk: 1.7.0_45
+Bundle-Version: 1.1.5.SNAPSHOT
+Bnd-LastModified: 1393949729438
+Bundle-ManifestVersion: 2
+Bundle-Activator: com.francetelecom.admindm.persist.Activator
+Bundle-Description: Definition of interface for Persistance for TR69 C
+ lient API
+Import-Package: org.osgi.framework;version="1.3"
+Bundle-SymbolicName: com.francetelecom.acse.modus.IPersistBundle
+

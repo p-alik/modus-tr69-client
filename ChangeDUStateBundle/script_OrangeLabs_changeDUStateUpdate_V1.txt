@@ -1,0 +1,75 @@
+﻿function changeDUStateUpdate(changeDUStateUpdate) {
+
+	print("changeDUStateUpdate(changeDUStateUpdate.UUID="+changeDUStateUpdate.UUID
+	+",changeDUStateUpdate.Version="+changeDUStateUpdate.Version
+	+",changeDUStateUpdate.URL="+changeDUStateUpdate.URL
+	+",changeDUStateUpdate.Username="+changeDUStateUpdate.Username
+	+",changeDUStateUpdate.Password="+changeDUStateUpdate.Password
+	+")");
+
+	var device=this;
+
+	var req = new TR69.ChangeDUStateRequest();
+	req.commandKey = device.id+"_TODO DEFINE THE COMMANDKEY!_UPDATE";
+	print("req.commandKey="+req.commandKey);
+	req.cwmpVersion = TR69.CwmpVersion.CWMP_1_2;
+	var operations = req.getOperations();
+
+	var op = new TR69.UpdateOpStruct();
+
+	op.uuid = changeDUStateUpdate.UUID;
+
+	op.version = changeDUStateUpdate.Version;
+	
+	op.url = changeDUStateUpdate.URL;
+
+	op.username = changeDUStateUpdate.Username;
+	op.password = changeDUStateUpdate.Password;
+	
+	operations.add(op);
+	
+	device.log('Let s execute: changeDUStateUpdate', changeDUStateUpdate.UUID);
+	var resp;
+	var con;
+	try {
+		print("Creating connection to device: "+device);
+		con = TR69.createConnection(device);
+			
+			print("Sending request: "+req);
+		resp = con.sendRequest(req);
+		
+		print("Response from ChangeDUStateRequest (update) is:"+resp);
+			
+		con.clearKeepAlive();    
+		if( resp instanceof TR69.ChangeDUStateResponse ) {
+		    if( resp.status == TR69.DownloadStatus.NOT_COMPLETED ) {
+		        device.log('software.update.inprogress',changeDUStateUpdate.UUID);
+		    } else {
+		    	print("Should be success!!! I.e. the device/CPE correctly gets the operation(s). "
+					+"It must now execute them...");
+		        device.log('software.update.success', changeDUStateUpdate.UUID);
+		    }
+		} else if ( resp instanceof TR69.SOAPFault ) {
+			device.log('software.update.error', changeDUStateUpdate.UUID, resp);
+			throw resp;
+		} else {
+		    device.log('software.update.error', changeDUStateUpdate.UUID, resp);
+		    throw resp;
+		}
+	} finally {
+		con.close();
+	}
+
+	return "executed: changeDUStateUpdate: "+changeDUStateUpdate+", resp: "+resp;
+
+}
+
+// Uncomment the following when testing in debug tab.
+//var input ={};
+//input['UUID']='uuid';
+//input['Version']='version';
+//input['URL']='http://.../mybundle.jar';
+//input['Username']='username';
+//input['Password']='password';
+//print(input);
+//print(changeDUStateUpdate(this, input));

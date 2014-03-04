@@ -1,0 +1,3 @@
+com\francetelecom\admindm\osgi\apply\BundleApply.class
+com\francetelecom\admindm\osgi\apply\AbstractApply.class
+com\francetelecom\admindm\osgi\apply\Activator.class

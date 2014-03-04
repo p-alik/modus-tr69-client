@@ -1,0 +1,14 @@
+com\francetelecom\admindm\changedustate\ChangeDUStateResponse.class
+com\francetelecom\admindm\changedustate\DUStateChangeCompleteEncoder.class
+com\francetelecom\admindm\changedustate\OpStructExecutionManagerException.class
+com\francetelecom\admindm\changedustate\Activator.class
+com\francetelecom\admindm\changedustate\CurrentState.class
+com\francetelecom\admindm\changedustate\DUStateChangeComplete.class
+com\francetelecom\admindm\changedustate\OpStructExecutionManager.class
+com\francetelecom\admindm\changedustate\ChangeDUStateDecoder.class
+com\francetelecom\admindm\changedustate\ChangeDUState.class
+com\francetelecom\admindm\changedustate\ChangeDUStateResponseEncoder.class
+com\francetelecom\admindm\changedustate\LocalData.class
+com\francetelecom\admindm\changedustate\DUStateChangeCompleteResponseDecoder.class
+com\francetelecom\admindm\changedustate\DUStateChangeCompleteException.class
+com\francetelecom\admindm\changedustate\DUStateChangeCompleteResponse.class

@@ -1,0 +1,87 @@
+----------
+----- How to: Define a device task executed in the ACS, and that sends JMS notif receivable from Java.
+----------
+
+Go to: http://bbb:ccc/nbbsora/login.ui (for example)
+
+Go in Administration, Settings, Advanced, Scripts
+
+Click on: New
+
+Fill form with:
+Name: OrangeLabs/tasks/DUStateChangeCompleteNotification
+Type: Workflow
+
+Click on: Accept
+
+Fill the script with the content of: script_OrangeLabs_tasks_DUStateChangeCompleteNotification_V1.txt
+
+Save
+
+Next, go in Administration, Actions, Manage Device Tasks and Campaigns
+
+Click on: Add, Provisioning Task
+
+Fill form with:
+Task Name: OrangeLabsDUStateChangeComplete
+Priority: 8
+Enabled: "true"
+Domain: HomeAPIDomain
+Script Name: OrangeLabs/tasks/DUStateChangeCompleteNotification
+Device Group: (All devices)
+Maintenance Window: (Every conversation)
+Start Date: the current date (for us, it was: 02/25/13)
+Start Time: the current time (for us, it was: 11:34)
+End Date: (Never)
+End Time: "leave blank"
+
+Click on: Save
+
+----------
+----- How to: Test that everything works
+----------
+
+Launch your device.
+
+Then execute CallChangeDUStateInstallCapabilityOnEdgeAcs.java (see ChangeDUStateBundleJavaClientViaAcs project, and update your credentials, etc. if needed)
+
+It must display:
+status: 200
+resp: "executed: {Password=Password_value, Username=Username_value, ExecutionEnvRef=ExecutionEnvRef_value, UUID=UUID_value, URL=http:\/\/...}, resp: com.netopia.nbbs.tr69.msg.ChangeDUStateResponse@45a5e606"
+
+Somethings happened on your device.
+
+And, then (or actually, when you want) launch JmsClientForDUStateChangeCompleteNotification.java
+
+It must display, amongst others things:
+
+2013-02-27 16:31:58 INFO  JmsClientForDUStateChangeCompleteNotification:132 - Received message: ...
+
+----------
+2013-02-27 16:31:31 DEBUG WireFormatNegotiator:82 - Sending: WireFormatInfo { version=9, properties={MaxFrameSize=9223372036854775807, CacheSize=1024, CacheEnabled=true, SizePrefixDisabled=false, MaxInactivityDurationInitalDelay=10000, TcpNoDelayEnabled=true, MaxInactivityDuration=30000, TightEncodingEnabled=true, StackTraceEnabled=true}, magic=[A,c,t,i,v,e,M,Q]}
+2013-02-27 16:31:31 DEBUG WireFormatNegotiator:118 - Received WireFormat: WireFormatInfo { version=6, properties={CacheSize=1024, CacheEnabled=true, SizePrefixDisabled=false, MaxInactivityDurationInitalDelay=10000, TcpNoDelayEnabled=true, MaxInactivityDuration=30000, TightEncodingEnabled=true, StackTraceEnabled=true}, magic=[A,c,t,i,v,e,M,Q]}
+2013-02-27 16:31:31 DEBUG InactivityMonitor:92 - Using min of local: WireFormatInfo { version=9, properties={MaxFrameSize=9223372036854775807, CacheSize=1024, CacheEnabled=true, SizePrefixDisabled=false, MaxInactivityDurationInitalDelay=10000, TcpNoDelayEnabled=true, MaxInactivityDuration=30000, TightEncodingEnabled=true, StackTraceEnabled=true}, magic=[A,c,t,i,v,e,M,Q]} and remote: WireFormatInfo { version=6, properties={CacheSize=1024, CacheEnabled=true, SizePrefixDisabled=false, MaxInactivityDurationInitalDelay=10000, TcpNoDelayEnabled=true, MaxInactivityDuration=30000, TightEncodingEnabled=true, StackTraceEnabled=true}, magic=[A,c,t,i,v,e,M,Q]}
+2013-02-27 16:31:31 DEBUG WireFormatNegotiator:125 - tcp://bbb/xxx:yyy@zzz before negotiation: OpenWireFormat{version=9, cacheEnabled=false, stackTraceEnabled=false, tightEncodingEnabled=false, sizePrefixDisabled=false, maxFrameSize=9223372036854775807}
+2013-02-27 16:31:31 DEBUG WireFormatNegotiator:140 - tcp://bbb/xxx:yyy@zzz after negotiation: OpenWireFormat{version=6, cacheEnabled=true, stackTraceEnabled=true, tightEncodingEnabled=true, sizePrefixDisabled=false, maxFrameSize=9223372036854775807}
+2013-02-27 16:31:31 DEBUG TaskRunnerFactory:91 - Initialized TaskRunnerFactory[ActiveMQ Session Task] using ExecutorService: java.util.concurrent.ThreadPoolExecutor@1ee3914
+2013-02-27 16:31:51 DEBUG AbstractInactivityMonitor:120 - WriteChecker 10015 ms elapsed since last write check.
+2013-02-27 16:31:51 DEBUG AbstractInactivityMonitor:169 - Running WriteCheck[tcp://xxx:yyy]
+
+2013-02-27 16:31:58 INFO  JmsClientForDUStateChangeCompleteNotification:132 - Received message: id:530006;model:Device-HomeAPI;serial:AZERTY_CHANGEDUSTATE_NBBSORA;params:undefined;uuid:UUID_value;deploymentUnitRef:33;version:1.0.0;resolved:false;executionUnitRefList:There is no way to get this info.;startTime:2013-02-27T16:31:42Z;completeTime:2013-02-27T16:31:43Z;currentState:Installed;fault:null;extra-comment:DUStateChangeCompleted message indicates successful install, or update.;msg.getCommandKey():530006_TODO DEFINE THE COMMANDKEY!_INSTALL
+
+2013-02-27 16:31:58 DEBUG ThreadPoolUtils:136 - Shutdown of ExecutorService: java.util.concurrent.ThreadPoolExecutor@1ee3914 is shutdown: true and terminated: false took: 0.000 seconds.
+2013-02-27 16:31:58 DEBUG ThreadPoolUtils:136 - Shutdown of ExecutorService: java.util.concurrent.ThreadPoolExecutor@1764be1 is shutdown: true and terminated: true took: 0.000 seconds.
+2013-02-27 16:31:58 DEBUG ThreadPoolUtils:136 - Shutdown of ExecutorService: java.util.concurrent.ThreadPoolExecutor@b753f8 is shutdown: true and terminated: false took: 0.000 seconds.
+2013-02-27 16:31:58 DEBUG TcpTransport:520 - Stopping transport tcp://bbb/xxx:yyy@zzz
+2013-02-27 16:31:58 DEBUG TaskRunnerFactory:91 - Initialized TaskRunnerFactory[ActiveMQ Task] using ExecutorService: java.util.concurrent.ThreadPoolExecutor@4413ee
+2013-02-27 16:31:58 DEBUG TcpTransport:538 - Closed socket Socket[addr=bbb/xxx,port=yyy,localport=zzz]
+2013-02-27 16:31:58 DEBUG ThreadPoolUtils:54 - Forcing shutdown of ExecutorService: java.util.concurrent.ThreadPoolExecutor@4413ee
+
+
+----------
+----- Any question(s)
+----------
+
+antonin.chazalet@orange.com
+marc.douet@orange.com
+anne.gereodolle@orange.com

@@ -1,0 +1,249 @@
+<!--
+/**
+ * Product Name : Modus TR-069 Orange
+ *
+ * Copyright c 2014 Orange
+ *
+ * This software is distributed under the Apache License, Version 2.0
+ * (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0 or see the "license.txt" file for
+ * more details
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Author: Olivier Beyler - Orange
+ * Author: Antonin Chazalet - Orange
+ */
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!--parent>
+		<groupId>com.francetelecom.maven</groupId>
+		<artifactId>pom-corporate</artifactId>
+		<version>1.5</version>
+	</parent-->
+
+	<groupId>com.francetelecom.acse.modus</groupId>
+	<artifactId>modus-clientTR69</artifactId>
+	<version>1.1.5-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>${project.artifactId}</name>
+	<description>Client TR69</description>
+
+	<developers>
+		<developer>
+			<name>Olivier Beyler</name>
+			<organization>Orange</organization>
+			<organizationUrl>orange.com</organizationUrl>
+			<email></email>
+		</developer>
+		<developer>
+			<name>Antonin Chazalet</name>
+			<organization>Orange</organization>
+			<organizationUrl>orange.com</organizationUrl>
+			<email>antonin.chazalet@orange.com;antonin.chazalet@gmail.com</email>
+		</developer>
+	</developers>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<configuration>
+					<descriptors>
+						<descriptor>genClient/assemble/bin.xml</descriptor>
+					</descriptors>
+				</configuration>
+			</plugin>
+			<!-- tell the compiler we can use 1.4 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>1.4</source>
+					<target>1.4</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.4.3</version>
+				<configuration>
+					<testFailureIgnore>true</testFailureIgnore>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>install</goal>
+						</goals>
+						<configuration>
+							<createChecksum>true</createChecksum>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.5</version>
+				<!-- <version>2.4.0</version> -->
+				<extensions>true</extensions>
+				<configuration>
+					<!-- Nota: due to a plugin limitation or bug, we also need to define 
+						remoteOBR and altDeploymentRepository in Maven command, see developer guide. -->
+					<remoteOBR>${project.artifactId}</remoteOBR>
+					<altDeploymentRepository>obr-dhsa::default::scp://orangeforge.rd.francetelecom.fr/home/groups/dhsa/htdocs/obr/dhsa</altDeploymentRepository>
+					<prefixUrl>http://dhsa.orangeforge.rd.francetelecom.fr/obr/dhsa/</prefixUrl>
+					<!-- prefixUrl>scp://orangeforge.rd.francetelecom.fr/home/groups/dhsa/htdocs/obr/dhsa</prefixUrl -->
+					<!-- >ignoreLock>true</ignoreLock -->
+					<repositoryId>obr-dhsa</repositoryId>
+					<!--repositoryId>DHSA repository</repositoryId -->
+					<!--url>http://dhsa.orangeforge.rd.francetelecom.fr/obr/dhsa/</url -->
+					<url>scp://orangeforge.rd.francetelecom.fr/home/groups/dhsa/htdocs/obr/dhsa</url>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>${project.artifactId}</artifactId>
+					<version>${project.version}</version>
+					<packaging>${project.packaging}</packaging>
+					<remoteOBR>true</remoteOBR>
+				</configuration>
+				<dependencies>
+					<dependency><!-- add support for ssh/scp -->
+						<groupId>org.apache.maven.wagon</groupId>
+						<artifactId>wagon-ssh</artifactId>
+						<version>2.5</version>
+						<!-- <version>1.0</version> -->
+					</dependency>
+				</dependencies>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<!-- <distributionManagement> <site> <id>yourdev-dhsa</id> <url>scp://shell.orangeforge.rd.francetelecom.fr/home/groups/dhsa/htdocs/modus-clientTR69</url> 
+		</site> </distributionManagement> -->
+
+	<dependencies>
+		<!--dependency> <groupId>org.jmock</groupId> <artifactId>jmock-junit3</artifactId> 
+			<version>2.5.1</version> <scope>test</scope> </dependency -->
+
+		<!--dependency> <groupId>jdom</groupId> <artifactId>jdom</artifactId> <version>1.0</version> 
+			<scope>compile</scope> </dependency -->
+
+		<dependency>
+			<groupId>net.sf.kxml</groupId>
+			<artifactId>kxml2</artifactId>
+			<version>2.3.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+
+		<!-- scope test -->
+		<dependency>
+			<groupId>org.ow2.odis</groupId>
+			<artifactId>junit-utils</artifactId>
+			<version>0.0.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<!--dependency> <groupId>com.francetelecom.acse.modus</groupId> <artifactId>TestOSGI</artifactId> 
+			<version>0.0.6</version> <scope>test</scope> </dependency -->
+
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>osgi_R4_compendium</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>osgi_R4_core</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+	</dependencies>
+	<modules>
+		<module>IPersistBundle</module>
+		<module>FilePersistBundle</module>
+		<module>TR106Bundle</module>
+		<module>TR69ClientAPI</module>
+		<module>ServerComBundle</module>
+		<module>ApplyBundle</module>
+		<!-- <module>CSVDataBundle</module> -->
+		<module>OSGIBundle</module>
+		<module>AddObjectBundle</module>
+		<module>DeleteObjectBundle</module>
+		<module>DownloadBundle</module>
+		<module>GetParameterAttributesBundle</module>
+		<module>GetParameterNamesBundle</module>
+		<module>GetParameterValuesBundle</module>
+		<module>GetRPCMethodsBundle</module>
+		<module>RebootBundle</module>
+		<module>SetParameterAttributesBundle</module>
+		<module>RestartBundle</module>
+		<module>SetParameterValuesBundle</module>
+		<!-- <module>StunClientBundle</module> -->
+		<!-- <module>UPnPMDModelBundle</module> -->
+		<module>OSGiApplyBundle</module>
+		<!-- <module>InfoServletApplyBundle</module> -->
+		<!-- <module>genClient</module> -->
+
+		<module>AdminCpeBundle</module>
+
+		<module>ChangeDUStateBundle</module>
+		<module>ChangeDUStateBundleJavaClientViaAcs</module>
+		<module>DUStateChangeCompleteJavaJMSClientViaACS</module>
+
+		<module>Hosts1ProfileBundle</module>
+		<module>SM_Baseline1ProfileBundle</module>
+	</modules>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>taglist-maven-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<tags>
+						<tag>TODO</tag>
+						<tag>FIXME</tag>
+						<tag>@todo</tag>
+						<tag>@deprecated</tag>
+					</tags>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
+
+	<scm>
+		<connection>scm:svn:https://orangeforge.rd.francetelecom.fr/svnroot/Modus/trunk/ClientTR69/trunk</connection>
+		<developerConnection>scm:svn:https://orangeforge.rd.francetelecom.fr/svnroot/Modus/trunk/ClientTR69/trunk</developerConnection>
+		<url>https://orangeforge.rd.francetelecom.fr/svnroot/Modus/trunk/ClientTR69/trunk</url>
+	</scm>
+
+</project>

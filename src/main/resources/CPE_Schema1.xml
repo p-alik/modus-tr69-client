@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : CPE_Schema1.xml
+    Created on : 16 décembre 2008, 15:44
+    Author     : olivier
+    Description:
+        Purpose of the document follows.
+-->
+
+<ns0:AddObject  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+   xmlns:ns0='urn:dslforum-org:cwmp-1-1'
+   xsi:schemaLocation='urn:dslforum-org:cwmp-1-1 CPE_Schema.xml'>
+    <ObjectName></ObjectName>
+    <ParameterKey></ParameterKey>
+
+</ns0:AddObject>

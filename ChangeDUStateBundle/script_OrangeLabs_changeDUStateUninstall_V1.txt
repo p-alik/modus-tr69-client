@@ -1,0 +1,68 @@
+﻿function changeDUStateUninstall(changeDUStateUninstall) {
+
+	print("changeDUStateUninstall(changeDUStateUninstall.UUID="+changeDUStateUninstall.UUID
+	+",changeDUStateUninstall.Version="+changeDUStateUninstall.Version
+	+",changeDUStateUninstall.ExecutionEnvRef="+changeDUStateUninstall.ExecutionEnvRef
+	+")");
+
+	var device=this;
+
+	var req = new TR69.ChangeDUStateRequest();
+	req.commandKey = device.id+"_TODO DEFINE THE COMMANDKEY!_UNINSTALL";
+	print("req.commandKey="+req.commandKey);
+	req.cwmpVersion = TR69.CwmpVersion.CWMP_1_2;
+	var operations = req.getOperations();
+
+	var op = new TR69.UninstallOpStruct();
+
+	op.uuid = changeDUStateUninstall.UUID;
+
+	op.version = changeDUStateUninstall.Version;
+
+	op.executionEnvRef = changeDUStateUninstall.ExecutionEnvRef;
+
+	operations.add(op);
+	
+	device.log('Let s execute: changeDUStateUninstall', changeDUStateUninstall.UUID);
+	var resp;
+	var con;
+	try {
+		print("Creating connection to device: "+device);
+		con = TR69.createConnection(device);
+			
+			print("Sending request: "+req);
+		resp = con.sendRequest(req);
+		
+		print("Response from ChangeDUStateRequest (uninstall) is:"+resp);
+			
+		con.clearKeepAlive();    
+		if( resp instanceof TR69.ChangeDUStateResponse ) {
+		    if( resp.status == TR69.DownloadStatus.NOT_COMPLETED ) {
+		        device.log('software.uninstall.inprogress',changeDUStateUninstall.UUID);
+		    } else {
+		    	print("Should be success!!! I.e. the device/CPE correctly gets the operation(s). "
+					+"It must now execute them...");
+		        device.log('software.uninstall.success', changeDUStateUninstall.UUID);
+		    }
+		} else if ( resp instanceof TR69.SOAPFault ) {
+			device.log('software.uninstall.error', changeDUStateUninstall.UUID, resp);
+			throw resp;
+		} else {
+		    device.log('software.uninstall.error', changeDUStateUninstall.UUID, resp);
+		    throw resp;
+		}
+	} finally {
+		con.close();
+	}
+
+	return "executed: changeDUStateUninstall: "+changeDUStateUninstall+", resp: "+resp;
+
+}
+
+// Uncomment the following when testing in debug tab.
+//var input ={};
+//input['UUID']='uuid';
+//input['Version']='version';
+//input['ExecutionEnvRef']='executionenvref';
+//print(input);
+//print(changeDUStateUninstall(this, input));

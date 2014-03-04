@@ -1,0 +1,5 @@
+com\francetelecom\admindm\getRPCMethods\GetRPCMethods.class
+com\francetelecom\admindm\getRPCMethods\GetRPCMethodsDecoder.class
+com\francetelecom\admindm\getRPCMethods\GetRPCMethodsResponseEncoder.class
+com\francetelecom\admindm\getRPCMethods\GetRPCMethodsResponse.class
+com\francetelecom\admindm\getRPCMethods\Activator.class

@@ -1,0 +1,26 @@
+Manifest-Version: 1.0
+Export-Package: com.francetelecom.admindm.api;uses:="com.francetelecom
+ .admindm.soap,com.francetelecom.admindm.model,org.osgi.service.log,or
+ g.xmlpull.v1,org.kxml2.kdom",com.francetelecom.admindm.model;uses:="c
+ om.francetelecom.admindm.api,com.francetelecom.admindm.soap,org.kxml2
+ .kdom,com.francetelecom.admindm.persist",com.francetelecom.admindm.so
+ ap;uses:="com.francetelecom.admindm.api,org.kxml2.kdom",com.francetel
+ ecom.admindm.inform;uses:="com.francetelecom.admindm.model,com.france
+ telecom.admindm.api,org.kxml2.kdom,com.francetelecom.admindm.soap",co
+ m.francetelecom.admindm.stunclient
+Private-Package: com.francetelecom.admindm
+Built-By: JZBV7415
+Tool: Bnd-0.0.311
+Bundle-Name: TR69ClientAPI
+Created-By: Apache Maven Bundle Plugin
+Build-Jdk: 1.7.0_45
+Bundle-Version: 1.1.5.SNAPSHOT
+Bnd-LastModified: 1393949730514
+Bundle-ManifestVersion: 2
+Bundle-Activator: com.francetelecom.admindm.Activator
+Bundle-Description: API client TR69
+Import-Package: com.francetelecom.admindm.persist,org.kxml2.kdom,org.o
+ sgi.framework;version="1.3",org.osgi.service.log;version="1.3",org.xm
+ lpull.v1
+Bundle-SymbolicName: com.francetelecom.acse.modus.TR69ClientAPI
+

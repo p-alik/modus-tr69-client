@@ -1,0 +1,31 @@
+# 
+# This file is used to by the Device Adpter to Set/Get values
+# This file must be updated with your own parameters values
+# 
+#InternetGatewayDevice.DeviceInfo.Manufacturer "ORANGERD12345"
+InternetGatewayDevice.DeviceInfo.Manufacturer "OLIVIER"
+InternetGatewayDevice.DeviceInfo.ManufacturerOUI "0016AE"
+InternetGatewayDevice.DeviceInfo.ProductClass "TR69GenericJAVA"
+InternetGatewayDevice.DeviceInfo.SerialNumber "AG111111"
+InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.ExternalIPAddress "10.194.59.44"
+InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPPConnection.1.Username "myIPClientUsername"
+InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANPPPConnection.1.ExternalIPAddress "10.194.59.44"
+InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANPPPConnection.1.Username "myPPPClientUsername"
+InternetGatewayDevice.DeviceSummary "myDeviceSummary"
+InternetGatewayDevice.DeviceInfo.HardwareVersion "HV1.0.0"
+InternetGatewayDevice.DeviceInfo.SoftwareVersion "SV1.0.5"
+InternetGatewayDevice.DeviceInfo.ProvisioningCode ""
+InternetGatewayDevice.DeviceInfo.SpecVersion "1.0"
+InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANIPConnection.1.MACAddress "00:11:22:33:44:55"
+InternetGatewayDevice.WANDevice.1.WANConnectionDevice.1.WANPPPConnection.1.MACAddress "00:11:22:33:44:55"
+InternetGatewayDevice.ManagementServer.ConnectionRequestPassword "orange"
+InternetGatewayDevice.LANDevice.1.Hosts.Host.1.MACAddress "00:11:22:33:44:55"
+# Below are NO DATAMODEL PATH
+# Next software version to use after a successful download
+InternetGatewayDevice.NextSoftwareVersionAfterDownloadSuccess "SV1.0.6"
+# OUI to send in a X INFORM request by the end user
+InternetGatewayDevice.X_OUI_INFORM "001349"
+# EVENT to send in a X INFORM request by the end user
+InternetGatewayDevice.X_EVENT_INFORM "GUI"
+# TargetFile Name to store the downloaded file (when no file name provided)
+InternetGatewayDevice.TargetFileName "/tmp/myTargetFileName"

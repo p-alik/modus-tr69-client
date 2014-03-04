@@ -1,0 +1,85 @@
+----------
+----- How to: Define a capability callable from Java
+----------
+
+Go to: http://bbb:ccc/nbbsora/login.ui (for example)
+
+Go in: Administration, Settings, Advanced, Model Descriptors
+
+Click on: Add
+
+For example, fill form with:
+Name: changeDUStateInstall
+Label: changeDUStateInstall
+
+Click on: Add new element
+
+Fill form with:
+Name:  URL
+Type: string
+Label: URL
+
+Click on: Save
+
+Add also the four remaining elements: UUID, Username, Password, ExecutionEnvRef
+
+Then, go in Administration, Settings, Advanced, Scripts
+
+Click on: New
+
+Fill form with:
+Name: OrangeLabs/changeDUStateInstall
+Type: Capability
+
+Click on: Accept
+
+Fill the script with the content of: script_OrangeLabs_changeDUStateInstall_V1.txt
+
+Save
+
+Next, go in Administration, Settings, Advanced, Device Capabilities
+
+Click on: Add
+
+Fill form with:
+Name: changeDUStateInstall
+Label: changeDUStateInstall
+Input Type: changeDUStateInstall
+Output Type: string
+Type: Other
+
+Finally, go in Administration, Customizations, Device Types
+
+Select your device type (our is Device Types, TR69, Shinemade, ShinemadeDevice-HomeAPI)
+
+Go in Capabilities tab
+
+Click on: Add
+
+Fill form with:
+Capability Name: changeDUStateInstall
+Script NAme: OrangeLabs/changeDUStateInstall
+
+Click on: Save
+
+----------
+----- How to: Test that everything works
+----------
+
+Launch your device.
+
+Then execute CallChangeDUStateInstallCapabilityOnEdgeAcs.java (see ChangeDUStateBundleJavaClientViaAcs project, and update your credentials, etc. if needed)
+
+It must display:
+status: 200
+resp: "executed: {Password=Password_value, Username=Username_value, ExecutionEnvRef=ExecutionEnvRef_value, UUID=UUID_value, URL=http:\/\/...}, resp: com.netopia.nbbs.tr69.msg.ChangeDUStateResponse@45a5e606"
+
+And somethings happened on your device.
+
+----------
+----- Any question(s)
+----------
+
+antonin.chazalet@orange.com;antonin.chazalet@gmail.com
+marc.douet@orange.com
+anne.gereodolle@orange.com
