@@ -1,9 +1,0 @@
-com\francetelecom\admindm\sm_baseline1profile\DuAndEuEventListener.class
-com\francetelecom\admindm\sm_baseline1profile\Activator.class
-com\francetelecom\admindm\sm_baseline1profile\exceptions\SM_Baseline1ProfileProfileException.class
-com\francetelecom\admindm\sm_baseline1profile\model\ExecutionUnitResquestedStateSetter.class
-com\francetelecom\admindm\sm_baseline1profile\ExecutionUnit.class
-com\francetelecom\admindm\sm_baseline1profile\utils\Utils.class
-com\francetelecom\admindm\sm_baseline1profile\DeploymentUnit.class
-com\francetelecom\admindm\sm_baseline1profile\model\SM_Baseline1ProfileDataModel.class
-com\francetelecom\admindm\sm_baseline1profile\Manager.class

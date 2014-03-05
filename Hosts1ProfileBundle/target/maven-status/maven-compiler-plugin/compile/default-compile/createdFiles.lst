@@ -1,7 +1,0 @@
-com\francetelecom\admindm\hosts1profile\Activator.class
-com\francetelecom\admindm\hosts1profile\exceptions\Hosts1ProfileException.class
-com\francetelecom\admindm\hosts1profile\model\Hosts1ProfileDataModel.class
-com\francetelecom\admindm\hosts1profile\model\HostNumberOfEntriesGetter.class
-com\francetelecom\admindm\hosts1profile\Manager.class
-com\francetelecom\admindm\hosts1profile\DevicesServiceListener.class
-com\francetelecom\admindm\hosts1profile\DeviceFromBaseDriver.class
