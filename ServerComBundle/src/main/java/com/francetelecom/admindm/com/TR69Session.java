@@ -30,6 +30,7 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.net.URL;
 
+import org.apache.regexp.RE;
 import org.kxml2.io.KXmlParser;
 import org.kxml2.io.KXmlSerializer;
 import org.kxml2.kdom.Document;
@@ -58,6 +59,10 @@ public final class TR69Session implements Session {
 	private static final int HTTP_200 = 200;
 	/** The Constant HTTP_204. */
 	private static final int HTTP_204 = 204;
+	/**	COLON REGULAR EXPRESSION */
+	private static final RE COLON_RE = new RE(":");
+	/** SESSION ID SEPARATOR */
+	private static final RE SESSION_ID_SEPARATOR = new RE("[//=;/]");
 	/** The session id. */
 	private String sessionId = "";
 
@@ -182,6 +187,7 @@ public final class TR69Session implements Session {
 				this.lastRPCMethod = (RPCMethod) outgoingRequest[i];
 				encoder = this.rpcMng.findRPCMethodEncoder(this.lastRPCMethod);
 				doSoapRequest(encoder.encode(this.lastRPCMethod), this.lastRPCMethod.getId());
+				this.parameterData.removeOutgoingRequest(lastRPCMethod);
 			}
 			// CPE has finish to send his request.
 			// It's time for ACS to give their request.
@@ -324,7 +330,8 @@ public final class TR69Session implements Session {
 			String[] out = null;
 
 			try {
-				out = root.getAttributeName(i).split(":");
+//				out = root.getAttributeName(i).split(":");
+				out = COLON_RE.split(root.getAttributeName(i));
 			} catch (Exception e) {
 				out = null;
 			}
@@ -435,7 +442,8 @@ public final class TR69Session implements Session {
 			if (cookies != null) {
 				Log.info("cookies Header" + cookies);
 				String separators = "[//=;/]";
-				String[] tokens = cookies.split(separators);
+//				String[] tokens = cookies.split(separators);
+				String[] tokens = SESSION_ID_SEPARATOR.split(cookies);
 				this.sessionId = null;
 				for (int i = 0; i < tokens.length; i++) {
 					if ("JSESSIONID".equals(tokens[i])) {

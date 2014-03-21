@@ -18,6 +18,8 @@ package com.francetelecom.tr157.implem;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.apache.regexp.RE;
+
 import com.francetelecom.admindm.model.IParameterData;
 import com.francetelecom.admindm.model.ParameterType;
 import com.francetelecom.admindm.soap.Fault;
@@ -76,7 +78,11 @@ public class ParameterImpl extends Parameter implements Observer {
 		if (isThresholdApplicable()) {
 			// check the last value
 			String value = (String) getParamValues().getValue();
-			String[] splittedString = value.split(";");
+			
+			RE semicolonRE = new RE(";");
+			
+//			String[] splittedString = value.split(";");
+			String[] splittedString = semicolonRE.split(value);
 			String lastValue = null;
 			String previousLastValue = null;
 			if (splittedString != null) {

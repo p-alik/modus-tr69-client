@@ -18,6 +18,8 @@ package com.francetelecom.tr106.implem;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.apache.regexp.RE;
+
 import com.francetelecom.admindm.api.EventCode;
 import com.francetelecom.admindm.api.GetterSystem;
 import com.francetelecom.admindm.model.EventStruct;
@@ -30,6 +32,16 @@ import com.francetelecom.tr106.gen.IPPingDiagnostics;
  * The Class IPingDiagnosticsImpl.
  */
 public final class IPingDiagnosticsImpl extends IPPingDiagnostics implements Observer {
+	
+	/**
+	 * LINE SEPARATOR REGEX
+	 */
+	private static final RE LINE_SEPARATOR_REGEX = new RE(System.getProperty("line.separator"));
+	
+	/**
+	 * SPACE REGEX
+	 */
+	private static final RE SPACE_REGEX = new RE(" ");
 
 	// The following attribute is not used.
 	// /** The last session id. */
@@ -85,14 +97,16 @@ public final class IPingDiagnosticsImpl extends IPPingDiagnostics implements Obs
 	 */
 	protected void parseResult() {
 		if (this.result != null) {
-			String[] tokens = this.result.split(System.getProperty("line.separator"));
+//			String[] tokens = this.result.split(System.getProperty("line.separator"));
+			String[] tokens = LINE_SEPARATOR_REGEX.split(this.result);
 			int nbtokens = tokens.length;
 			String resume = (tokens[nbtokens - 2]);
 			System.out.println("resume" + resume);
 			System.out.println("avant derniere ligne" + tokens[nbtokens - 1]);
 			// System.out.println("derni�re ligne"+tokens[nbtokens]);
 			// TODO full parsingof result
-			String[] line1 = (tokens[nbtokens - 1]).split(" ");
+//			String[] line1 = (tokens[nbtokens - 1]).split(" ");
+			String[] line1 = SPACE_REGEX.split(tokens[nbtokens - 1]);
 			getParamSuccessCount().setDirectValue(Integer.valueOf(line1[0]));
 			if (line1.length > 10) {
 				getParamFailureCount().setDirectValue(Integer.valueOf(line1[5].substring(1)));

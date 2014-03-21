@@ -81,7 +81,7 @@ public final class DUStateChangeComplete implements RPCMethod {
 	 * @return RPCMethod's name
 	 */
 	public String getName() {
-		return ChangeDUState.NAME;
+		return NAME;
 	}
 
 	/**

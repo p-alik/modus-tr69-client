@@ -32,6 +32,8 @@ import java.util.Observable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.regexp.RE;
+
 import com.francetelecom.admindm.api.CheckCallBack;
 import com.francetelecom.admindm.api.Factory;
 import com.francetelecom.admindm.api.Getter;
@@ -619,7 +621,8 @@ public final class Parameter extends Observable {
 	 */
 	protected static Long getDATE(final String key, final String value) {
 		Long result = null;
-		Pattern timeNoMilli = Pattern.compile(
+		RE timeNoMilliRE = new RE(
+//		Pattern timeNoMilli = Pattern.compile(
 		// Absolute time 2009-01-01T00:00:00Z
 		// time zoned Z is optional
 				"(" + "[2][0-9][0-9][0-9]" + // 2000 to 2999
@@ -652,7 +655,8 @@ public final class Parameter extends Observable {
 						")" + // 00 seconds
 						"([Z]|([/+|/-]([0][0-9]|[1][0-9])))?" + // 00 TIME ZONE
 						"");
-		Pattern timeMilli = Pattern.compile(
+		RE timeMilliRE = new RE(
+//		Pattern timeMilli = Pattern.compile(
 		// Absolute time 2009-01-01T00:00:00.000Z
 		// time zoned Z is optional
 				"(" + "[2][0-9][0-9][0-9]" + // 2000 to 2999
@@ -695,12 +699,10 @@ public final class Parameter extends Observable {
 			} else {
 				DateFormat format;
 				Date date = null;
-				Matcher m = timeNoMilli.matcher(value.toString());
-				Matcher m2 = timeMilli.matcher(value.toString());
-				if (m.matches()) { // Si on n'a pas les millisecondes
+				if (timeNoMilliRE.match(value.toString())) { // Si on n'a pas les millisecondes
 					format = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'Z'");
 					date = format.parse(value);
-				} else if (m2.matches()) { // si on les a
+				} else if (timeMilliRE.match(value.toString())) { // si on les a
 					format = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'.'S'Z'");
 					date = format.parse(value);
 				} else

@@ -58,8 +58,7 @@
 							org.osgi.service.log,
 							org.kxml2.kdom,
 							org.xmlpull.v1,
-							java.io,
-							java.util
+							org.apache.regexp
 						</Import-Package>
 						<Private-Package>
 							com.francetelecom.admindm
@@ -87,5 +86,11 @@
 			<artifactId>IPersistBundle</artifactId>
 			<version>1.1.5-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>jakarta-regexp</groupId>
+			<artifactId>jakarta-regexp</artifactId>
+			<version>1.4</version>
+			<scope>provided</scope>
+		</dependency>		
 	</dependencies>
 </project>

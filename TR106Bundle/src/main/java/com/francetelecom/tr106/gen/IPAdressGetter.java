@@ -16,6 +16,8 @@
 
 package com.francetelecom.tr106.gen;
 
+import org.apache.regexp.RE;
+
 // import com.francetelecom.admindm.api.Log;
 import com.francetelecom.admindm.com.HttpServer;
 
@@ -23,9 +25,18 @@ public class IPAdressGetter implements com.francetelecom.admindm.api.Getter {
 
 	public Object get(String sessionId) {
 		String url = HttpServer.getURL();
+		
+		RE re = new RE(":");
+		
+		
 		// Log.debug("valeur url:"+url) ;
 		// Log.debug("valeur IPAdress:"+url.split(":")[0].substring(2)) ;
-		return url.split(":")[1].substring(2);
+//		return url.split(":")[1].substring(2) ;
+		
+		String ip = re.split(url)[1].substring(2);
+		System.out.println("IPGetter ip = " + ip);
+		
+		return ip ;
 	}
 
 }

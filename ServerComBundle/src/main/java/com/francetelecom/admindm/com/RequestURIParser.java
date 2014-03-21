@@ -23,6 +23,8 @@ package com.francetelecom.admindm.com;
 
 import java.util.Hashtable;
 
+import org.apache.regexp.RE;
+
 import com.francetelecom.admindm.api.Log;
 
 /**
@@ -43,6 +45,21 @@ public class RequestURIParser {
 	private final String rawRequestUri;
 	/** attributes. */
 	private final Hashtable attributes;
+	
+	/**
+	 * QUESTION MARK REGULAR EXPRESSION
+	 */
+	private static final RE QUESTION_MARK_RE = new RE("?");
+	
+	/**
+	 * & REGULAR EXPRESSION
+	 */
+	private static final RE AND_MARK_RE = new RE("&");
+	
+	/**
+	 * = REGULAR EXPRESSION
+	 */
+	private static final RE EQUAL_SIGN_RE = new RE("=");
 
 	/**
 	 * Initiates a RequestURIParser. The attributes of the RequestURI are stored
@@ -59,7 +76,8 @@ public class RequestURIParser {
 			// String[] splittedRequestUri = rawRequestUri.split("\\?");
 			String[] splittedRequestUri;
 			try {
-				splittedRequestUri = rawRequestUri.split("?");
+//				splittedRequestUri = rawRequestUri.split("?");
+				splittedRequestUri = QUESTION_MARK_RE.split(rawRequestUri);
 
 			} catch (Exception e) {
 				splittedRequestUri = null;
@@ -73,7 +91,8 @@ public class RequestURIParser {
 						// attributesString.split("&");
 						String[] splittedAttributes;
 						try {
-							splittedAttributes = attributesString.split("&");
+//							splittedAttributes = attributesString.split("&");
+							splittedAttributes = AND_MARK_RE.split(attributesString);
 						} catch (Exception e) {
 							splittedAttributes = null;
 						}
@@ -89,7 +108,8 @@ public class RequestURIParser {
 									// .split("=");
 									String[] splittedRequestUriMember;
 									try {
-										splittedRequestUriMember = splittedString.split("=");
+//										splittedRequestUriMember = splittedString.split("=");
+										splittedRequestUriMember = EQUAL_SIGN_RE.split(splittedString);
 									} catch (Exception e) {
 										splittedRequestUriMember = null;
 									}

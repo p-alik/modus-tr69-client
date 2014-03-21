@@ -56,10 +56,12 @@ public final class Activator implements BundleActivator {
 			Activator.RPC_METHOD_MANAGEMENT_SERVICE.registerRPCDecoder(ChangeDUState.NAME, new ChangeDUStateDecoder());
 			Activator.RPC_METHOD_MANAGEMENT_SERVICE.registerRPCEncoder(ChangeDUStateResponse.NAME,
 					new ChangeDUStateResponseEncoder());
-
+			
 			// DUStateChangeComplete
-			Activator.RPC_METHOD_MANAGEMENT_SERVICE.registerRPCMethod(DUStateChangeCompleteResponse.NAME);
-			Activator.RPC_METHOD_MANAGEMENT_SERVICE.registerRPCDecoder(DUStateChangeCompleteResponse.NAME,
+			Activator.RPC_METHOD_MANAGEMENT_SERVICE.registerRPCMethod(DUStateChangeComplete.NAME);
+			Activator.RPC_METHOD_MANAGEMENT_SERVICE.registerRPCEncoder(DUStateChangeComplete.NAME, new DUStateChangeCompleteEncoder());
+			Activator.RPC_METHOD_MANAGEMENT_SERVICE.registerRPCDecoder(
+					DUStateChangeCompleteResponse.NAME,
 					new DUStateChangeCompleteResponseDecoder());
 
 			this.opStructExecutionManager = OpStructExecutionManager.getSingletonInstance();

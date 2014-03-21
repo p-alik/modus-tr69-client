@@ -24,7 +24,8 @@
 							com.francetelecom.admindm.soap,
 							org.osgi.framework,
 							org.osgi.service.log,
-							org.kxml2.kdom, org.xmlpull.v1
+							org.kxml2.kdom, org.xmlpull.v1,
+							org.apache.regexp
 						</Import-Package>
 						<Private-Package />
 						<!--
@@ -44,6 +45,12 @@
 			<groupId>com.francetelecom.acse.modus</groupId>
 			<artifactId>TR69ClientAPI</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta-regexp</groupId>
+			<artifactId>jakarta-regexp</artifactId>
+			<version>1.4</version>
+			<scope>provided</scope>
 		</dependency>		
 	</dependencies>
 </project>

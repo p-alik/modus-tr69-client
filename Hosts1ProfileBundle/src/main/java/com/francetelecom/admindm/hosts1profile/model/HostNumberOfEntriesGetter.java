@@ -24,6 +24,7 @@ package com.francetelecom.admindm.hosts1profile.model;
 
 import com.francetelecom.admindm.api.Getter;
 import com.francetelecom.admindm.api.Log;
+import com.francetelecom.admindm.hosts1profile.Manager;
 
 /**
  * @author: JZBV7415
@@ -38,9 +39,10 @@ public class HostNumberOfEntriesGetter implements Getter {
 	public Object get(final String arg0) {
 		Log.debug("Entry get HostNumberOfEntriesGetter");
 
-		String result = null;
+//		String result = null;
+		return new Long(Manager.getSingletonInstance().getDevices().size() + 1);
 
-		return result;
+//		return result;
 	}
 
 }

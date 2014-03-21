@@ -523,6 +523,7 @@ public class SM_Baseline1ProfileDataModel {
 		deploymentUnitNumberOfEntriesLeaf.setWritable(false);
 		deploymentUnitNumberOfEntriesLeaf.setNotification(0);
 		deploymentUnitNumberOfEntriesLeaf.setActiveNotificationDenied(false);
+		deploymentUnitNumberOfEntriesLeaf.setValue(new Long(0));
 
 		Parameter executionUnitNumberOfEntriesLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
 				+ SOFTWAREMODULES + EXECUTION_UNIT_NUMBER_OF_ENTRIES);
@@ -531,6 +532,7 @@ public class SM_Baseline1ProfileDataModel {
 		executionUnitNumberOfEntriesLeaf.setWritable(false);
 		executionUnitNumberOfEntriesLeaf.setNotification(0);
 		executionUnitNumberOfEntriesLeaf.setActiveNotificationDenied(false);
+		executionUnitNumberOfEntriesLeaf.setValue(new Long(0));
 
 		Parameter execEnvBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + SOFTWAREMODULES
 				+ EXECENV);

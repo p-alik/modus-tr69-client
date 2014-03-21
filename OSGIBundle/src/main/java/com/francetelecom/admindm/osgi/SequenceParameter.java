@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.regexp.RE;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
@@ -42,6 +43,11 @@ import com.francetelecom.admindm.soap.Fault;
  * 
  */
 public class SequenceParameter implements Setter {
+	
+	/**
+	 * Regular expression with semicolom
+	 */
+	private static final RE SEMICOLON_RE =  new RE(";");
 
 	/** The bundle context. */
 	private final BundleContext bundleContext;
@@ -120,7 +126,9 @@ public class SequenceParameter implements Setter {
 	private void processUninstall(Object obj) {
 		// get a splitted array of bundle location
 		String value = (String) obj;
-		String[] locations = value.split(";");
+		
+		String[] locations = SEMICOLON_RE.split(value);
+//		String[] locations = value.split(";");
 		if (locations != null) {
 			// check locations
 			for (int i = 0; i < locations.length; i++) {
@@ -159,7 +167,9 @@ public class SequenceParameter implements Setter {
 	private void processStop(Object obj) {
 		// get a splitted array of bundle location
 		String value = (String) obj;
-		String[] locations = value.split(";");
+		
+		String[] locations = SEMICOLON_RE.split(value);
+//		String[] locations = value.split(";");
 		if (locations != null) {
 			// check locations
 			for (int i = 0; i < locations.length; i++) {
@@ -181,7 +191,9 @@ public class SequenceParameter implements Setter {
 	private void processStart(Object obj) throws Fault {
 		// get a splitted array of bundle location
 		String value = (String) obj;
-		String[] locations = value.split(";");
+		
+		String[] locations = SEMICOLON_RE.split(value);
+//		String[] locations = value.split(";");
 		List bundleInfoList = new ArrayList();
 		if (locations != null) {
 			// check locations

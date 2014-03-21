@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.apache.regexp.RE;
+
 import com.francetelecom.admindm.api.Log;
 import com.francetelecom.admindm.model.IParameterData;
 import com.francetelecom.admindm.model.Parameter;
@@ -210,10 +212,14 @@ public class SampleTask implements Observer {
 	private void setCSVValue(String parameterName, Object value) {
 		Parameter valuesParameter = parameterData.getParameter(parameterName);
 		String oldValue = (String) valuesParameter.getValue();
-		// String[] splittedResult = oldValue.split(";");
+		//String[] splittedResult = oldValue.split(";");
+		
+		RE semicolonRE = new RE(";");
+		
 		String[] splittedResult;
 		try {
-			splittedResult = oldValue.split(";");
+//			splittedResult = oldValue.split(";");
+			splittedResult = semicolonRE.split(oldValue);
 		} catch (Exception e1) {
 			splittedResult = null;
 		}

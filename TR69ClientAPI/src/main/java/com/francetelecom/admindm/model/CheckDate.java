@@ -24,6 +24,8 @@ package com.francetelecom.admindm.model;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.regexp.RE;
+
 import com.francetelecom.admindm.api.CheckCallBack;
 import com.francetelecom.admindm.soap.Fault;
 import com.francetelecom.admindm.soap.FaultUtil;
@@ -41,11 +43,12 @@ public final class CheckDate implements CheckCallBack {
 	 *            the value
 	 * @throws Fault
 	 *             the fault
-	 */
-	public void check(final Object value) throws Fault {
-		Pattern time = Pattern.compile(
-		// Absolute time 2009-01-01T00:00:00Z
-		// time zoned Z is optional
+     */
+    public void check(final Object value) throws Fault {
+    	RE timeRE = new RE(
+//        Pattern time = Pattern.compile(
+        // Absolute time 2009-01-01T00:00:00Z
+                // time zoned Z is optional
 				"(" + "[2][0-9][0-9][0-9]" + // 2000 to 2999
 						"-" + // -
 						"([0][1-9]|[1][0-2])" + // 01 - alias January ... 12
@@ -78,14 +81,16 @@ public final class CheckDate implements CheckCallBack {
 						")" + // 00 seconds
 						"([Z]|([/+|/-]([0][0-9]|[1][0-9])))?" + // 00 TIME ZONE
 						"");
-		if (value == null) {
-			throwFault("value is null");
-		}
-		Matcher m = time.matcher(value.toString());
-		if (!m.matches()) {
-			throwFault(value.toString());
-		}
-	}
+        if (value==null){
+            throwFault("value is null");
+        }
+        
+        if (!timeRE.match(value.toString())) {
+//        Matcher m = time.matcher(value.toString());
+//        if (!m.matches()) {
+            throwFault(value.toString());
+        }
+    }
 
 	private void throwFault(final String value) throws Fault {
 		StringBuffer error;

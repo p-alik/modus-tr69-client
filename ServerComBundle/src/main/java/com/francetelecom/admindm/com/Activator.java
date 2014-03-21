@@ -70,6 +70,7 @@ public final class Activator implements BundleActivator, ServiceListener {
 	public void start(final BundleContext context) throws Exception {
 		this.bundleContext = context;
 		File conf = FileUtil.getFileFromShortName(FileUtil.IPCONF);
+		System.out.println("file :" + conf.getAbsolutePath());
 		if (conf != null) {
 			InputStream in = null;
 			try {
@@ -78,6 +79,7 @@ public final class Activator implements BundleActivator, ServiceListener {
 				in = new FileInputStream(conf);
 				properties.load(in);
 				String ipAddress = properties.getProperty("ipAddress");
+				System.out.println("ipAddress = " + ipAddress);
 				if ((ipAddress != null) && !this.isEmpty(ipAddress.trim())) {
 					Log.debug("IP address: " + ipAddress);
 					UDPServer.setIPAddress(ipAddress);

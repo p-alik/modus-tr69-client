@@ -33,7 +33,7 @@ import com.francetelecom.admindm.api.Log;
 import com.francetelecom.admindm.model.IParameterData;
 import com.francetelecom.admindm.stunclient.ISTUNCLient;
 
-/**
+	/**
  * <p>
  * This class provides a UDP server used to receive the UDP Connection Request
  * sent by the ACS.
@@ -100,7 +100,7 @@ public final class UDPServer implements Runnable {
 		}
 		return udpServer;
 	}
-
+	
 	/**
 	 * Sets the best ni.
 	 * 
@@ -316,7 +316,7 @@ public final class UDPServer implements Runnable {
 	 * @return an InetAddress or null
 	 */
 	public static InetAddress getExternalInetAddress() {
-		try {
+			try {
 			if (UDPServer.address != null) {
 				try {
 					return InetAddress.getByName(UDPServer.address);

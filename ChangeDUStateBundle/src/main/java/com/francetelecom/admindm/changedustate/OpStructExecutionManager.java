@@ -91,8 +91,9 @@ public class OpStructExecutionManager implements Runnable {
 	}
 
 	public void addChangeDUStateToBeExecuted(final ChangeDUState changeDUState) {
-		synchronized (this.lock) {
+		synchronized (this.listOfChangeDUStateToBeExecuted) {
 			this.listOfChangeDUStateToBeExecuted.add(changeDUState);
+			this.listOfChangeDUStateToBeExecuted.notify();
 		}
 	}
 
@@ -100,13 +101,25 @@ public class OpStructExecutionManager implements Runnable {
 
 		while (true) {
 			ChangeDUState changeDUStateToBeExecuted = null;
-			synchronized (this.lock) {
-				Iterator it = this.listOfChangeDUStateToBeExecuted.iterator();
-				if (it.hasNext()) {
-					changeDUStateToBeExecuted = (ChangeDUState) it.next();
-				} // no "else" needed.
-				this.listOfChangeDUStateToBeExecuted.remove(changeDUStateToBeExecuted);
+			synchronized (this.listOfChangeDUStateToBeExecuted) {
+				if (listOfChangeDUStateToBeExecuted.isEmpty()) {
+					try {
+						listOfChangeDUStateToBeExecuted.wait();
+					} catch (InterruptedException e) {
+						// return thread
+						return;
+					}
+				}
+				// at this point, we are sure the list is not empty
+				changeDUStateToBeExecuted = (ChangeDUState) listOfChangeDUStateToBeExecuted.remove(0);
 			}
+//			synchronized (this.lock) {
+//				Iterator it = this.listOfChangeDUStateToBeExecuted.iterator();
+//				if (it.hasNext()) {
+//					changeDUStateToBeExecuted = (ChangeDUState) it.next();
+//				} // no "else" needed.
+//				this.listOfChangeDUStateToBeExecuted.remove(changeDUStateToBeExecuted);
+//			}
 
 			if (changeDUStateToBeExecuted != null) {
 				Log.debug("Start the execution of: " + changeDUStateToBeExecuted);
@@ -481,94 +494,36 @@ public class OpStructExecutionManager implements Runnable {
 				// Emit an Inform(... DU STATE CHANGE COMPLETE, M ChangeDUState
 				// ...); from CPE to ACS.
 
-				ServiceReference iComServiceRef = this.bundleContext.getServiceReference(ICom.class.getName());
-				ICom iCom = (ICom) this.bundleContext.getService(iComServiceRef);
-				Log.debug("iCom: " + iCom);
-
-				// Use the following: iCom.setParameterData(pParameterData);
-				// But how can a new ParameterData(...) be created?
-				Session session = Com.session;
-
-				if (session == null) {
-					// XXX AAA: handle this error.
-					String errorMessage = "Session is null.";
-					Log.error(errorMessage);
-					throw new RuntimeException(errorMessage);
+				
+				ServiceReference parameterDataSr = bundleContext.getServiceReference(IParameterData.class.getName());
+				IParameterData parameterData = null;
+				if (parameterDataSr != null) {
+					parameterData = (IParameterData) bundleContext.getService(parameterDataSr);
+				}
+				
+				
+				if (parameterData != null) {
+					parameterData.addEvent(new EventStruct(
+						EventCode.DU_STATE_CHANGE_COMPLETE, commandKey));
+				
+					DUStateChangeComplete duStateChangeComplete = new DUStateChangeComplete(
+							opResultStructList, commandKey, "1");
+					parameterData.addOutgoingRequest(duStateChangeComplete);
 				}
 
-				IParameterData parameterData = session.getParameterData();
-				parameterData.addEvent(new EventStruct(EventCode.DU_STATE_CHANGE_COMPLETE, commandKey));
-
-				Inform inform = new Inform(parameterData, 1);
-
-				// See in TR69Session Java Class: private String id = "1";
-				// What is this "id" for?!.
-				inform.setId("1");
-
-				try {
-					inform.perform(session);
-				} catch (Fault e) {
-					// XXX AAA: handle this error.
-					e.printStackTrace();
-					String errorMessage = e.getFaultstring();
-					Log.error(errorMessage, e);
-					throw new RuntimeException(errorMessage, e);
-				}
-
-				// Let's get the InformResponse sent, in response, by the ACS,
-				// and continue the interactions: DUStateChangeComplete...;
-				boolean foundTheInformResponseOfTheInformSentJustAbove = false;
-				for (int timeout = 0; timeout < 10; timeout = timeout + 1) {
-					Object[] eventStructs = parameterData.getEventsArray();
-
-					for (int j = 0; j < eventStructs.length; j = j + 1) {
-						EventStruct eventStruct = (EventStruct) eventStructs[j];
-						if ((EventCode.DU_STATE_CHANGE_COMPLETE.equals(eventStruct.getEventCode()))
-								&& (commandKey.equals(eventStruct.getCommandKey()))) {
-							foundTheInformResponseOfTheInformSentJustAbove = true;
-						}
-					}
-
-					if (foundTheInformResponseOfTheInformSentJustAbove) {
-						// Continue the interactions: DUStateChangeComplete...
-						DUStateChangeComplete duStateChangeComplete = new DUStateChangeComplete(opResultStructList,
-								commandKey, inform.getId());
-						try {
-							duStateChangeComplete.perform(session);
-						} catch (Fault e) {
-							e.printStackTrace();
-							String errorMessage = e.getMessage();
-							Log.error(errorMessage, e);
-						}
-						break;
-					}
-
-					try {
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-						String errorMessage = e.getMessage();
-						Log.error(errorMessage, e);
-					}
-				}
-
-				// Handle the "timeout crossed" case.
-				if (!foundTheInformResponseOfTheInformSentJustAbove) {
-					Log.error("Timeout has been crossed, the ACS never sent the InformResponse, or the CPE never got it!");
-				}
 
 			} else {
 				// Log.debug("There is no ChangeDUState to execute.");
 			}
 
-			try {
-				Thread.sleep(10000);
-			} catch (InterruptedException e) {
-				// XXX AAA: handle this error.
-				e.printStackTrace();
-				String errorMessage = e.getMessage();
-				Log.error(errorMessage, e);
-			}
+//			try {
+//				Thread.sleep(10000);
+//			} catch (InterruptedException e) {
+//				// XXX AAA: handle this error.
+//				e.printStackTrace();
+//				String errorMessage = e.getMessage();
+//				Log.error(errorMessage, e);
+//			}
 		}
 	}
 

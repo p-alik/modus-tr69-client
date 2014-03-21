@@ -191,6 +191,7 @@ public class Hosts1ProfileDataModel {
 		hostNumberOfEntriesLeaf.setWritable(false);
 		hostNumberOfEntriesLeaf.setNotification(0);
 		hostNumberOfEntriesLeaf.setActiveNotificationDenied(false);
+		hostNumberOfEntriesLeaf.setGetter(new HostNumberOfEntriesGetter());
 
 		Parameter hostBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST);
 		hostBranch.setType(ParameterType.ANY);

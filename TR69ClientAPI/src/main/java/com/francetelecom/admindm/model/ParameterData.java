@@ -520,7 +520,9 @@ public final class ParameterData extends Observable implements IParameterData, O
 	 *            the rpc method
 	 */
 	public void removeOutgoingRequest(final RPCMethod rpcMethod) {
-		this.lsOutgoingRequest.remove(rpcMethod);
+		Log.debug("removeRPCMethod " + rpcMethod.getId() + "-" + rpcMethod.getName() + " from lsOutgoingRequest");
+		boolean removed = this.lsOutgoingRequest.remove(rpcMethod);
+		Log.debug("removed= " + removed);
 	}
 
 	/**

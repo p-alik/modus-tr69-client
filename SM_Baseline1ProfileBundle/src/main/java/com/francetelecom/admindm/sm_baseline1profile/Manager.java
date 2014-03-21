@@ -23,6 +23,7 @@
 package com.francetelecom.admindm.sm_baseline1profile;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class Manager {
@@ -90,6 +91,22 @@ public class Manager {
 			this.deploymentUnits.remove(du);
 		}
 	}
+	
+	/**
+	 * Get a DU by id
+	 * @param duid deployment unit id
+	 * @return a deployment unit or null
+	 */
+	public DeploymentUnit getDeploymentUnit(long duid) {
+		List deploymentUnits = getDeploymentUnits();
+		for(Iterator it = deploymentUnits.iterator(); it.hasNext();) {
+			DeploymentUnit du = (DeploymentUnit) it.next();
+			if (du.getDuid() == duid) {
+				return du;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * @return List of ExecutionUnit
@@ -123,6 +140,22 @@ public class Manager {
 		synchronized (lock2) {
 			this.executionUnits.remove(eu);
 		}
+	}
+	
+	/**
+	 * Get an execution unit by euid
+	 * @param euid execution unit id
+	 * @return the requested execution unit or null
+	 */
+	public ExecutionUnit getExecutionUnit(long euid) {
+		List executionUnits = getExecutionUnits();
+		for(Iterator it = executionUnits.iterator(); it.hasNext();) {
+			ExecutionUnit eu = (ExecutionUnit) it.next();
+			if (eu.getEuid() == euid) {
+				return eu;
+			}
+		}
+		return null;
 	}
 
 }

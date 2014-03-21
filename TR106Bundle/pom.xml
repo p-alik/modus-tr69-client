@@ -31,7 +31,8 @@
 							org.osgi.framework,
 							org.osgi.service.log,
 							org.osgi.service.upnp,
-							org.osgi.util.tracker
+							org.osgi.util.tracker,
+							org.apache.regexp
 						</Import-Package>
 
 						<Private-Package>						
@@ -63,5 +64,11 @@
 			<artifactId>ServerComBundle</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>jakarta-regexp</groupId>
+			<artifactId>jakarta-regexp</artifactId>
+			<version>1.4</version>
+			<scope>provided</scope>
+		</dependency>	
 	</dependencies>
 </project>

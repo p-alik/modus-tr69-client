@@ -23,6 +23,7 @@
 package com.francetelecom.admindm.hosts1profile;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.francetelecom.admindm.api.Log;
@@ -92,6 +93,17 @@ public class Manager {
 			Log.debug("hosts1profile.Manager.removeADevice(" + d + ")");
 			this.devices.remove(d);
 		}
+	}
+	
+	public DeviceFromBaseDriver getADevice(String servicePid) {
+		List devices = getDevices();
+		for(Iterator it = devices.iterator(); it.hasNext();) {
+			DeviceFromBaseDriver d = (DeviceFromBaseDriver) it.next();
+			if (d.getServicePid().equals(servicePid)) {
+				return d;
+			}
+		}
+		return null;
 	}
 
 }

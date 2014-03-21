@@ -49,28 +49,10 @@ public class DevicesServiceListener implements ServiceListener {
 	private IParameterData pmDataService;
 	private static BundleContext BUNDLE_CONTEXT;
 
-	public DevicesServiceListener(final IParameterData pmDataService, final BundleContext bundleContext) {
+	public DevicesServiceListener(final IParameterData pmDataService,
+			final BundleContext bundleContext) {
 		this.pmDataService = pmDataService;
 		BUNDLE_CONTEXT = bundleContext;
-	}
-
-	public void serviceChanged(final ServiceEvent event) {
-		Log.info("event: " + event);
-
-		// System.out.println("AC1982: 3 févr. 2014 12:06:50: event: " + event);
-		// System.out.println("AC1982: 3 févr. 2014 12:07:05: event.getType(): " + event.getType());
-		// System.out.println("AC1982: 3 févr. 2014 12:07:07: event.toString(): " + event.toString());
-		// System.out.println("AC1982: 3 févr. 2014 12:07:08: event.getClass(): " + event.getClass());
-		// System.out
-		// .println("AC1982: 3 févr. 2014 12:07:10: event.getServiceReference(): " + event.getServiceReference());
-		// System.out.println("AC1982: 3 févr. 2014 17:38:22: event.getServiceReference().getBundle(): "
-		// + event.getServiceReference().getBundle());
-		// System.out.println("AC1982: 3 févr. 2014 12:07:11: event.getSource(): " + event.getSource());
-		//
-		// // Retrieve service from serviceReference, and thanks to bundleContext.
-		// Object o = BUNDLE_CONTEXT.getService(event.getServiceReference());
-		// System.out.println("AC1982: 4 févr. 2014 11:39:18: o: " + o);
-		// System.out.println("AC1982: 4 févr. 2014 11:39:25: o.getClass(): " + o.getClass());
 
 		try {
 			// Update data model corresponding to Hosts.
@@ -84,34 +66,153 @@ public class DevicesServiceListener implements ServiceListener {
 		}
 	}
 
+	public void serviceChanged(final ServiceEvent event) {
+		Log.info("event: " + event);
+
+		// System.out.println("AC1982: 3 févr. 2014 12:06:50: event: " + event);
+		// System.out.println("AC1982: 3 févr. 2014 12:07:05: event.getType(): "
+		// + event.getType());
+		// System.out.println("AC1982: 3 févr. 2014 12:07:07: event.toString(): "
+		// + event.toString());
+		// System.out.println("AC1982: 3 févr. 2014 12:07:08: event.getClass(): "
+		// + event.getClass());
+		// System.out
+		// .println("AC1982: 3 févr. 2014 12:07:10: event.getServiceReference(): "
+		// + event.getServiceReference());
+		// System.out.println("AC1982: 3 févr. 2014 17:38:22: event.getServiceReference().getBundle(): "
+		// + event.getServiceReference().getBundle());
+		// System.out.println("AC1982: 3 févr. 2014 12:07:11: event.getSource(): "
+		// + event.getSource());
+		//
+		// // Retrieve service from serviceReference, and thanks to
+		// bundleContext.
+		// Object o = BUNDLE_CONTEXT.getService(event.getServiceReference());
+		// System.out.println("AC1982: 4 févr. 2014 11:39:18: o: " + o);
+		// System.out.println("AC1982: 4 févr. 2014 11:39:25: o.getClass(): " +
+		// o.getClass());
+
+		updateHost(event);
+
+	}
+
+	private void updateHost(ServiceEvent serviceEvent) {
+
+		// check if the service holds the DEVICE_CATEGORY property
+		Object deviceCategoryObject = serviceEvent.getServiceReference()
+				.getProperty(DeviceFromBaseDriver.DEVICE_CATEGORY_KEY);
+
+		if (deviceCategoryObject != null) {
+
+			// cast device category
+			String[] deviceCategory = null;
+			if (deviceCategoryObject instanceof String[]) {
+				deviceCategory = (String[]) deviceCategoryObject;
+			} else if (deviceCategoryObject instanceof String) {
+				deviceCategory = new String[] { (String) deviceCategoryObject };
+			} else {
+				Log.error("deviceCategory property is neither an array of String nor a String. Nothing to do...");
+				return;
+			}
+			// retrieve other properties
+			String deviceDescription = (String) serviceEvent
+					.getServiceReference().getProperty(
+							DeviceFromBaseDriver.DEVICE_DESCRIPTION_KEY);
+			String deviceSerial = (String) serviceEvent.getServiceReference()
+					.getProperty(DeviceFromBaseDriver.DEVICE_SERIAL_KEY);
+			String servicePid = (String) serviceEvent.getServiceReference()
+					.getProperty(DeviceFromBaseDriver.SERVICE_PID_KEY);
+			String deviceFriendlyName = (String) serviceEvent
+					.getServiceReference().getProperty(
+							DeviceFromBaseDriver.DEVICE_FRIENDLY_NAME_KEY);
+			
+			if (servicePid == null) {
+				Log.error("service.pid is null. Nothing to do...");
+				return;
+			}
+
+			DeviceFromBaseDriver deviceFromBaseDriver = null;
+
+			switch (serviceEvent.getType()) {
+			case ServiceEvent.REGISTERED:
+				// new service
+				// add a new Host into datamodel
+				try {
+					deviceFromBaseDriver = new DeviceFromBaseDriver(
+							deviceCategory, deviceDescription, deviceSerial,
+							servicePid, deviceFriendlyName);
+					Hosts1ProfileDataModel
+							.createDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
+									this.pmDataService, deviceFromBaseDriver);
+					Manager.getSingletonInstance().addADevice(
+							deviceFromBaseDriver);
+				} catch (Exception e) {
+					Log.error("unable to create a new Host", e);
+				}
+
+				break;
+			case ServiceEvent.MODIFIED:
+				// nothing to do
+				break;
+			case ServiceEvent.UNREGISTERING:
+				// service gone
+				// retrieve the related host and delete it
+				deviceFromBaseDriver = Manager.getSingletonInstance().getADevice(servicePid);
+				if (deviceFromBaseDriver != null) {
+					try {
+						 Hosts1ProfileDataModel
+						 .removeDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
+						 this.pmDataService, deviceFromBaseDriver);
+						 Manager.getSingletonInstance().removeADevice(deviceFromBaseDriver);
+					} catch (Fault e) {
+						e.printStackTrace();
+						Log.error(e.getMessage(), e);
+						throw new RuntimeException(e.getMessage(), e);
+					}
+				}
+				break;
+			}
+			
+			// update number of entries
+			
+		} // else nothing
+		
+		
+	}
+
 	/**
 	 * @throws NullPointerException
 	 * @throws Fault
 	 * @throws InvalidSyntaxException
 	 */
-	private void updateHosts() throws NullPointerException, Fault, InvalidSyntaxException {
+	private void updateHosts() throws NullPointerException, Fault,
+			InvalidSyntaxException {
 		// Update the devices internal data, and the data model.
 		List listOfDeviceFromBaseDriver = retrieveOsgiServicesDevicesRegisteredByTheBaseDrivers();
 
-		List listOfDeviceFromManager = Manager.getSingletonInstance().getDevices();
+		List listOfDeviceFromManager = Manager.getSingletonInstance()
+				.getDevices();
 
 		// Publish devices base drivers' data to TR69 data model, if needed.
 		for (int i = 0; i < listOfDeviceFromBaseDriver.size(); i = i + 1) {
-			DeviceFromBaseDriver deviceFromBaseDriver = (DeviceFromBaseDriver) listOfDeviceFromBaseDriver.get(i);
+			DeviceFromBaseDriver deviceFromBaseDriver = (DeviceFromBaseDriver) listOfDeviceFromBaseDriver
+					.get(i);
 
 			boolean deviceHasBeenFoundInManager = false;
 
 			// Check that this device is NOT already present.
 			for (int j = 0; j < listOfDeviceFromManager.size(); j = j + 1) {
-				DeviceFromBaseDriver device = (DeviceFromBaseDriver) listOfDeviceFromManager.get(j);
-				if (deviceFromBaseDriver.getServicePid().equals(device.getServicePid())) {
+				DeviceFromBaseDriver device = (DeviceFromBaseDriver) listOfDeviceFromManager
+						.get(j);
+				if (deviceFromBaseDriver.getServicePid().equals(
+						device.getServicePid())) {
 					break;
 				}
 			}
 
 			if (!(deviceHasBeenFoundInManager)) {
-				Hosts1ProfileDataModel.createDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
-						this.pmDataService, deviceFromBaseDriver);
+				Hosts1ProfileDataModel
+						.createDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
+								this.pmDataService, deviceFromBaseDriver);
 				Manager.getSingletonInstance().addADevice(deviceFromBaseDriver);
 			}
 		}
@@ -119,10 +220,12 @@ public class DevicesServiceListener implements ServiceListener {
 		// Let's search, and find the removed devices.
 		Iterator devicesIterator = listOfDeviceFromManager.iterator();
 		while (devicesIterator.hasNext()) {
-			DeviceFromBaseDriver device = (DeviceFromBaseDriver) devicesIterator.next();
+			DeviceFromBaseDriver device = (DeviceFromBaseDriver) devicesIterator
+					.next();
 			boolean deviceHasBeenFoundInBundleContext = false;
 			for (int i = 0; i < listOfDeviceFromBaseDriver.size(); i = i + 1) {
-				DeviceFromBaseDriver d = (DeviceFromBaseDriver) listOfDeviceFromBaseDriver.get(i);
+				DeviceFromBaseDriver d = (DeviceFromBaseDriver) listOfDeviceFromBaseDriver
+						.get(i);
 				if (device.getServicePid() == d.getServicePid()) {
 					deviceHasBeenFoundInBundleContext = true;
 					break;
@@ -133,8 +236,9 @@ public class DevicesServiceListener implements ServiceListener {
 				// Here, it means that the device is NO longer present.
 				// Let's update the data model accordingly.
 				try {
-					Hosts1ProfileDataModel.removeDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
-							this.pmDataService, device);
+					Hosts1ProfileDataModel
+							.removeDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
+									this.pmDataService, device);
 					Manager.getSingletonInstance().removeADevice(device);
 				} catch (Fault e) {
 					e.printStackTrace();
@@ -146,9 +250,12 @@ public class DevicesServiceListener implements ServiceListener {
 
 		// As a consequence, the value of Device.Hosts.HostNumberOfEntries is
 		// updated.
-		Integer devicesNumberOfEntries = new Integer(Manager.getSingletonInstance().getDevices().size() + 1);
-		Parameter devicesNumberOfEntriesLeaf = this.pmDataService.createOrRetrieveParameter(this.pmDataService
-				.getRoot() + Hosts1ProfileDataModel.HOSTS + Hosts1ProfileDataModel.HOST_NUMBER_OF_ENTRIES);
+		Integer devicesNumberOfEntries = new Integer(Manager
+				.getSingletonInstance().getDevices().size() + 1);
+		Parameter devicesNumberOfEntriesLeaf = this.pmDataService
+				.createOrRetrieveParameter(this.pmDataService.getRoot()
+						+ Hosts1ProfileDataModel.HOSTS
+						+ Hosts1ProfileDataModel.HOST_NUMBER_OF_ENTRIES);
 		devicesNumberOfEntriesLeaf.setValue(devicesNumberOfEntries);
 	}
 
@@ -156,15 +263,18 @@ public class DevicesServiceListener implements ServiceListener {
 		List listOfDeviceFromBaseDriver = new ArrayList();
 
 		try {
-			ServiceReference[] srs = BUNDLE_CONTEXT.getAllServiceReferences(null, null);
+			ServiceReference[] srs = BUNDLE_CONTEXT.getAllServiceReferences(
+					null, null);
 			for (int i = 0; i < srs.length; i = i + 1) {
 				ServiceReference sr = srs[i];
-				Log.debug("Let's have a look on the serviceReference number: " + i
-						+ " that is related to the bundleId: " + sr.getBundle().getBundleId());
+				Log.debug("Let's have a look on the serviceReference number: "
+						+ i + " that is related to the bundleId: "
+						+ sr.getBundle().getBundleId());
 
 				String[] deviceCategory = null;
 				try {
-					deviceCategory = (String[]) sr.getProperty(DeviceFromBaseDriver.DEVICE_CATEGORY_KEY);
+					deviceCategory = (String[]) sr
+							.getProperty(DeviceFromBaseDriver.DEVICE_CATEGORY_KEY);
 				} catch (ClassCastException e) {
 					Log.debug("As debug info for the serviceReference number: "
 							+ i
@@ -185,10 +295,14 @@ public class DevicesServiceListener implements ServiceListener {
 					}
 				}
 
-				String deviceDescription = (String) sr.getProperty(DeviceFromBaseDriver.DEVICE_DESCRIPTION_KEY);
-				String deviceSerial = (String) sr.getProperty(DeviceFromBaseDriver.DEVICE_SERIAL_KEY);
-				String servicePid = (String) sr.getProperty(DeviceFromBaseDriver.SERVICE_PID_KEY);
-				String deviceFriendlyName = (String) sr.getProperty(DeviceFromBaseDriver.DEVICE_FRIENDLY_NAME_KEY);
+				String deviceDescription = (String) sr
+						.getProperty(DeviceFromBaseDriver.DEVICE_DESCRIPTION_KEY);
+				String deviceSerial = (String) sr
+						.getProperty(DeviceFromBaseDriver.DEVICE_SERIAL_KEY);
+				String servicePid = (String) sr
+						.getProperty(DeviceFromBaseDriver.SERVICE_PID_KEY);
+				String deviceFriendlyName = (String) sr
+						.getProperty(DeviceFromBaseDriver.DEVICE_FRIENDLY_NAME_KEY);
 
 				if (deviceCategory == null) {
 					Log.debug("The serviceReference number: "
@@ -196,13 +310,18 @@ public class DevicesServiceListener implements ServiceListener {
 							+ " does NOT have DEVICE_CATEGORY property. As a consequence, this serviceReference is ignored. Its service's properties are: "
 							+ sr.getPropertyKeys());
 				} else {
-					Log.debug("The serviceReference number: " + i
+					Log.debug("The serviceReference number: "
+							+ i
 							+ " has DEVICE_CATEGORY property. As a consequence, let's try to take it into account.");
 					try {
-						listOfDeviceFromBaseDriver.add(new DeviceFromBaseDriver(deviceCategory, deviceDescription,
-								deviceSerial, servicePid, deviceFriendlyName));
+						listOfDeviceFromBaseDriver
+								.add(new DeviceFromBaseDriver(deviceCategory,
+										deviceDescription, deviceSerial,
+										servicePid, deviceFriendlyName));
 					} catch (Exception e) {
-						Log.error("This serviceReference is NOT compliant (so it is rejected).", e);
+						Log.error(
+								"This serviceReference is NOT compliant (so it is rejected).",
+								e);
 					}
 				}
 			}

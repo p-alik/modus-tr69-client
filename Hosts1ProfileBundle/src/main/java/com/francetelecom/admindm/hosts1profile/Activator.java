@@ -62,7 +62,8 @@ public final class Activator implements BundleActivator {
 		}
 
 		Log.info("Start " + HOSTS_1_PROFILE_BUNDLE + ", creation");
-
+		this.devicesServiceListener = new DevicesServiceListener(this.pmDataSvc, this.bundleContext);
+		this.bundleContext.addServiceListener(this.devicesServiceListener);
 		try {
 			Log.info(HOSTS_1_PROFILE_BUNDLE + ", Modification du datamodel");
 			// Hosts1ProfileDataModel hosts1ProfileDataModel =
@@ -72,8 +73,8 @@ public final class Activator implements BundleActivator {
 			throw new Hosts1ProfileException("Execution error: " + e.getMessage(), null);
 		}
 
-		this.devicesServiceListener = new DevicesServiceListener(this.pmDataSvc, this.bundleContext);
-		this.bundleContext.addServiceListener(this.devicesServiceListener);
+		
+		
 	}
 
 	public void stop(final BundleContext bundleContext) throws Exception {

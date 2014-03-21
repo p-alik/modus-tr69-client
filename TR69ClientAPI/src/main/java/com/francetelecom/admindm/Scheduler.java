@@ -164,7 +164,7 @@ public final class Scheduler implements ServiceListener {
 		if (checkState()) {
 			Log.info("TR69Client is starting");
 			// allow discovers root of datamodel
-			File conf = FileUtil.getFileFromShortName(FileUtil.CONFIG);
+			File conf = FileUtil.getFileFromShortName(FileUtil.DATAMODEL);
 			if (conf != null) {
 				InputStream in = null;
 				try {
