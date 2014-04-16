@@ -124,7 +124,7 @@ public final class Com implements Runnable, Observer, ICom {
 			this.server = new HttpServer(this);
 			// udp connection request
 			this.udpServer.setParameterData(this.parameterData);
-			//this.udpServer.startUDPServer();
+			this.udpServer.startUDPServer();
 			// configure observers
 			this.parameterData.addObserver(this);
 			this.paramURL = this.parameterData.createOrRetrieveParameter(this.parameterData.getRoot() + URL);
