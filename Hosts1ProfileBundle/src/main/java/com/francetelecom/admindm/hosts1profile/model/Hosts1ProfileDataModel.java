@@ -160,19 +160,16 @@ public class Hosts1ProfileDataModel {
 	 * 
 	 */
 	private void initImplementationInternalData() {
-		// // Call base driver implem here, instead of the following line of
-		// // mock.
+		// // Call base driver implem here, instead of the following line of mock.
 		// zigbeeDevices = new ZigbeeDevices();
 
+		Manager manager = Manager.getSingletonInstance();
 		// Update the deployment units internal data, and the data model.
+		// Publish device base driver's data to TR69 data model.
 		List listOfDeviceFromBaseDriver = DevicesServiceListener
 				.retrieveOsgiServicesDevicesRegisteredByTheBaseDrivers();
-
-		// Publish device base driver's data to TR69 data model.
-		Iterator it = listOfDeviceFromBaseDriver.iterator();
-		while (it.hasNext()) {
-			DeviceFromBaseDriver deviceFromBaseDriver = (DeviceFromBaseDriver) it.next();
-			Manager.getSingletonInstance().addADevice(deviceFromBaseDriver);
+		for (Iterator it = listOfDeviceFromBaseDriver.iterator(); it.hasNext(); ) {
+			manager.addADevice((DeviceFromBaseDriver) it.next());
 		}
 	}
 
@@ -181,10 +178,12 @@ public class Hosts1ProfileDataModel {
 	 * @throws Fault
 	 */
 	private void createDatamodel(final IParameterData pmDataService) throws Fault {
-		Parameter hostsBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS);
+		final String _HOSTS_ROOT = pmDataService.getRoot() + HOSTS;
+		final String _HOST_NUMBER_ZERO = _HOSTS_ROOT + HOST + HOST_NUMBER_ZERO;
+		Parameter hostsBranch = pmDataService.createOrRetrieveParameter(_HOSTS_ROOT);
 		hostsBranch.setType(ParameterType.ANY);
 
-		Parameter hostNumberOfEntriesLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS
+		Parameter hostNumberOfEntriesLeaf = pmDataService.createOrRetrieveParameter(_HOSTS_ROOT
 				+ HOST_NUMBER_OF_ENTRIES);
 		hostNumberOfEntriesLeaf.setType(ParameterType.UINT);
 		hostNumberOfEntriesLeaf.setStorageMode(StorageMode.COMPUTED);
@@ -193,16 +192,14 @@ public class Hosts1ProfileDataModel {
 		hostNumberOfEntriesLeaf.setActiveNotificationDenied(false);
 		hostNumberOfEntriesLeaf.setGetter(new HostNumberOfEntriesGetter());
 
-		Parameter hostBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST);
+		Parameter hostBranch = pmDataService.createOrRetrieveParameter(_HOSTS_ROOT + HOST);
 		hostBranch.setType(ParameterType.ANY);
 
 		// This CPE is itself a "leaf".
-		Parameter hostNumberZeroBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ HOST_NUMBER_ZERO);
+		Parameter hostNumberZeroBranch = pmDataService.createOrRetrieveParameter(_HOST_NUMBER_ZERO);
 		hostNumberZeroBranch.setType(ParameterType.ANY);
 
-		Parameter ipAddressLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ HOST_NUMBER_ZERO + IP_ADDRESS);
+		Parameter ipAddressLeaf = pmDataService.createOrRetrieveParameter(_HOST_NUMBER_ZERO + IP_ADDRESS);
 		ipAddressLeaf.setType(ParameterType.STRING);
 		ipAddressLeaf.setStorageMode(StorageMode.COMPUTED);
 		ipAddressLeaf.setWritable(false);
@@ -217,8 +214,8 @@ public class Hosts1ProfileDataModel {
 		ipAddressLeaf.setValue(IPAddress);
 
 		// Deprecated.
-		Parameter addressSourceLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ HOST_NUMBER_ZERO + ADDRESS_SOURCE);
+		Parameter addressSourceLeaf = pmDataService.createOrRetrieveParameter(_HOST_NUMBER_ZERO
+				+ ADDRESS_SOURCE);
 		addressSourceLeaf.setType(ParameterType.STRING);
 		addressSourceLeaf.setStorageMode(StorageMode.COMPUTED);
 		addressSourceLeaf.setWritable(false);
@@ -226,8 +223,8 @@ public class Hosts1ProfileDataModel {
 		addressSourceLeaf.setActiveNotificationDenied(false);
 		addressSourceLeaf.setValue("DEPRECATED cf. TR181-i2-a6.");
 
-		Parameter leaseTimeRemainingLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS
-				+ HOST + HOST_NUMBER_ZERO + LEASE_TIME_REMAINING);
+		Parameter leaseTimeRemainingLeaf = pmDataService.createOrRetrieveParameter(_HOST_NUMBER_ZERO
+				+ LEASE_TIME_REMAINING);
 		leaseTimeRemainingLeaf.setType(ParameterType.STRING);
 		leaseTimeRemainingLeaf.setStorageMode(StorageMode.COMPUTED);
 		leaseTimeRemainingLeaf.setWritable(false);
@@ -235,8 +232,8 @@ public class Hosts1ProfileDataModel {
 		leaseTimeRemainingLeaf.setActiveNotificationDenied(false);
 		leaseTimeRemainingLeaf.setValue("DEPRECATED cf. TR181-i2-a6.");
 
-		Parameter physAddressLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ HOST_NUMBER_ZERO + PHYS_ADDRESS);
+		Parameter physAddressLeaf = pmDataService.createOrRetrieveParameter(_HOST_NUMBER_ZERO
+				+ PHYS_ADDRESS);
 		physAddressLeaf.setType(ParameterType.STRING);
 		physAddressLeaf.setStorageMode(StorageMode.COMPUTED);
 		physAddressLeaf.setWritable(false);
@@ -250,8 +247,8 @@ public class Hosts1ProfileDataModel {
 		// .getProperlyFormattedMacAddress();
 		physAddressLeaf.setValue(properlyFormattedMacAddress);
 
-		Parameter hostNameLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ HOST_NUMBER_ZERO + HOST_NAME);
+		Parameter hostNameLeaf = pmDataService.createOrRetrieveParameter(_HOST_NUMBER_ZERO
+				+ HOST_NAME);
 		hostNameLeaf.setType(ParameterType.STRING);
 		hostNameLeaf.setStorageMode(StorageMode.COMPUTED);
 		hostNameLeaf.setWritable(false);
@@ -264,8 +261,8 @@ public class Hosts1ProfileDataModel {
 		} // no "else" needed.
 		hostNameLeaf.setValue(hostName);
 
-		Parameter activeLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ HOST_NUMBER_ZERO + ACTIVE);
+		Parameter activeLeaf = pmDataService.createOrRetrieveParameter(_HOST_NUMBER_ZERO
+				+ ACTIVE);
 		activeLeaf.setType(ParameterType.BOOLEAN);
 		activeLeaf.setStorageMode(StorageMode.COMPUTED);
 		activeLeaf.setWritable(false);
@@ -273,13 +270,11 @@ public class Hosts1ProfileDataModel {
 		activeLeaf.setActiveNotificationDenied(false);
 		activeLeaf.setValue(ACTIVE_VALUE);
 
-		List listOfDeviceFromBaseDriver = Manager.getSingletonInstance().getDevices();
-
 		// Publish device base driver's data to TR69 data model.
-		Iterator it = listOfDeviceFromBaseDriver.iterator();
-		while (it.hasNext()) {
-			DeviceFromBaseDriver deviceFromBaseDriver = (DeviceFromBaseDriver) it.next();
-			createDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(pmDataService, deviceFromBaseDriver);
+		List listOfDeviceFromBaseDriver = Manager.getSingletonInstance().getDevices();
+		for (Iterator it = listOfDeviceFromBaseDriver.iterator(); it.hasNext(); ) {
+			createDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(pmDataService,
+					(DeviceFromBaseDriver) it.next());
 		}
 
 		// Device.Hosts.HostNumberOfEntries's value is equal to the number of
@@ -296,14 +291,15 @@ public class Hosts1ProfileDataModel {
 	 */
 	public static void createDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
 			final IParameterData pmDataService, final DeviceFromBaseDriver deviceFromBaseDriver) throws Fault {
+		final String _HOSTS_ROOT = pmDataService.getRoot() + HOSTS;
 		String deviceNumberBranchIsTheServicePid = deviceFromBaseDriver.getServicePid();
+		final String _SERVICE_PID_ROOT = _HOSTS_ROOT + HOST + deviceNumberBranchIsTheServicePid + ".";
 
-		Parameter hostNumberZeroBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + ".");
+		Parameter hostNumberZeroBranch = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT);
 		hostNumberZeroBranch.setType(ParameterType.ANY);
 
-		Parameter ipAddressLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + IP_ADDRESS);
+		Parameter ipAddressLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT 
+				+ IP_ADDRESS);
 		ipAddressLeaf.setType(ParameterType.STRING);
 		ipAddressLeaf.setStorageMode(StorageMode.COMPUTED);
 		ipAddressLeaf.setWritable(false);
@@ -316,8 +312,8 @@ public class Hosts1ProfileDataModel {
 		ipAddressLeaf.setValue(IPAddress);
 
 		// Deprecated.
-		Parameter addressSourceLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + ADDRESS_SOURCE);
+		Parameter addressSourceLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ ADDRESS_SOURCE);
 		addressSourceLeaf.setType(ParameterType.STRING);
 		addressSourceLeaf.setStorageMode(StorageMode.COMPUTED);
 		addressSourceLeaf.setWritable(false);
@@ -325,8 +321,8 @@ public class Hosts1ProfileDataModel {
 		addressSourceLeaf.setActiveNotificationDenied(false);
 		addressSourceLeaf.setValue("DEPRECATED cf. TR181-i2-a6.");
 
-		Parameter leaseTimeRemainingLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS
-				+ HOST + deviceNumberBranchIsTheServicePid + "." + LEASE_TIME_REMAINING);
+		Parameter leaseTimeRemainingLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ LEASE_TIME_REMAINING);
 		leaseTimeRemainingLeaf.setType(ParameterType.STRING);
 		leaseTimeRemainingLeaf.setStorageMode(StorageMode.COMPUTED);
 		leaseTimeRemainingLeaf.setWritable(false);
@@ -334,8 +330,8 @@ public class Hosts1ProfileDataModel {
 		leaseTimeRemainingLeaf.setActiveNotificationDenied(false);
 		leaseTimeRemainingLeaf.setValue("DEPRECATED cf. TR181-i2-a6.");
 
-		Parameter physAddressLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + PHYS_ADDRESS);
+		Parameter physAddressLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ PHYS_ADDRESS);
 		physAddressLeaf.setType(ParameterType.STRING);
 		physAddressLeaf.setStorageMode(StorageMode.COMPUTED);
 		physAddressLeaf.setWritable(false);
@@ -345,8 +341,8 @@ public class Hosts1ProfileDataModel {
 		String ieeeaddress = "PhysAddress CAN NOT BE IMPLEMENTED";
 		physAddressLeaf.setValue(ieeeaddress);
 
-		Parameter hostNameLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + HOST_NAME);
+		Parameter hostNameLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ HOST_NAME);
 		hostNameLeaf.setType(ParameterType.STRING);
 		hostNameLeaf.setStorageMode(StorageMode.COMPUTED);
 		hostNameLeaf.setWritable(false);
@@ -356,8 +352,8 @@ public class Hosts1ProfileDataModel {
 		String name = "HostName CAN NOT BE IMPLEMENTED";
 		hostNameLeaf.setValue(name);
 
-		Parameter activeLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + ACTIVE);
+		Parameter activeLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ ACTIVE);
 		activeLeaf.setType(ParameterType.BOOLEAN);
 		activeLeaf.setStorageMode(StorageMode.COMPUTED);
 		activeLeaf.setWritable(false);
@@ -368,8 +364,8 @@ public class Hosts1ProfileDataModel {
 		// The following implements the part of the data model related to:
 		// NonMockedDeviceFromBaseDriver.DEVICE_CATEGORY_KEY
 
-		Parameter deviceCategoryLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + DeviceFromBaseDriver.DEVICE_CATEGORY_KEY);
+		Parameter deviceCategoryLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ DeviceFromBaseDriver.DEVICE_CATEGORY_KEY);
 		deviceCategoryLeaf.setType(ParameterType.STRING);
 		deviceCategoryLeaf.setStorageMode(StorageMode.COMPUTED);
 		deviceCategoryLeaf.setWritable(false);
@@ -380,13 +376,13 @@ public class Hosts1ProfileDataModel {
 			if (deviceCategory == null) {
 				deviceCategory = deviceFromBaseDriver.getDeviceCategory()[i];
 			} else {
-				deviceCategory = deviceCategory + ";;" + deviceFromBaseDriver.getDeviceCategory()[i];
+				deviceCategory += ";;" + deviceFromBaseDriver.getDeviceCategory()[i];
 			}
 		}
 		deviceCategoryLeaf.setValue(deviceCategory);
 
-		Parameter deviceDescriptionLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS
-				+ HOST + deviceNumberBranchIsTheServicePid + "." + DeviceFromBaseDriver.DEVICE_DESCRIPTION_KEY);
+		Parameter deviceDescriptionLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ DeviceFromBaseDriver.DEVICE_DESCRIPTION_KEY);
 		deviceDescriptionLeaf.setType(ParameterType.STRING);
 		deviceDescriptionLeaf.setStorageMode(StorageMode.COMPUTED);
 		deviceDescriptionLeaf.setWritable(false);
@@ -395,8 +391,8 @@ public class Hosts1ProfileDataModel {
 		String deviceDescription = deviceFromBaseDriver.getDeviceDescription();
 		deviceDescriptionLeaf.setValue(deviceDescription);
 
-		Parameter deviceSerialLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + DeviceFromBaseDriver.DEVICE_SERIAL_KEY);
+		Parameter deviceSerialLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ DeviceFromBaseDriver.DEVICE_SERIAL_KEY);
 		deviceSerialLeaf.setType(ParameterType.STRING);
 		deviceSerialLeaf.setStorageMode(StorageMode.COMPUTED);
 		deviceSerialLeaf.setWritable(false);
@@ -411,8 +407,8 @@ public class Hosts1ProfileDataModel {
 		// deviceNumberBranch.
 		// The following line of code can NOT be displayed by Modus in the data
 		// model.
-		Parameter servicePidLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + DeviceFromBaseDriver.SERVICE_PID_KEY);
+		Parameter servicePidLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ DeviceFromBaseDriver.SERVICE_PID_KEY);
 		servicePidLeaf.setType(ParameterType.STRING);
 		servicePidLeaf.setStorageMode(StorageMode.COMPUTED);
 		servicePidLeaf.setWritable(false);
@@ -421,8 +417,8 @@ public class Hosts1ProfileDataModel {
 		String servicePid = deviceFromBaseDriver.getServicePid();
 		servicePidLeaf.setValue(servicePid);
 
-		Parameter deviceFriendlyNameLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS
-				+ HOST + deviceNumberBranchIsTheServicePid + "." + DeviceFromBaseDriver.DEVICE_FRIENDLY_NAME_KEY);
+		Parameter deviceFriendlyNameLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ DeviceFromBaseDriver.DEVICE_FRIENDLY_NAME_KEY);
 		deviceFriendlyNameLeaf.setType(ParameterType.STRING);
 		deviceFriendlyNameLeaf.setStorageMode(StorageMode.COMPUTED);
 		deviceFriendlyNameLeaf.setWritable(false);
@@ -440,41 +436,34 @@ public class Hosts1ProfileDataModel {
 	public static void removeDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
 			final IParameterData pmDataService, final DeviceFromBaseDriver deviceFromBaseDriver) throws Fault {
 		String deviceNumberBranchIsTheServicePid = deviceFromBaseDriver.getServicePid();
+		final String _SERVICE_PID_ROOT = pmDataService.getRoot() + HOSTS + HOST
+				+ deviceNumberBranchIsTheServicePid + ".";
 
-		Parameter hostNumberServicePidBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS
-				+ HOST + deviceNumberBranchIsTheServicePid + ".");
+		Parameter hostNumberServicePidBranch = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT);
 		hostNumberServicePidBranch.setType(ParameterType.ANY);
 
-		Parameter ipAddressLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + IP_ADDRESS);
-
+		Parameter ipAddressLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ IP_ADDRESS);
 		// Deprecated.
-		Parameter addressSourceLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + ADDRESS_SOURCE);
-
-		Parameter leaseTimeRemainingLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS
-				+ HOST + deviceNumberBranchIsTheServicePid + "." + LEASE_TIME_REMAINING);
-
-		Parameter physAddressLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + PHYS_ADDRESS);
-
-		Parameter hostNameLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + HOST_NAME);
-
-		Parameter activeLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + ACTIVE);
-
+		Parameter addressSourceLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ ADDRESS_SOURCE);
+		Parameter leaseTimeRemainingLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ LEASE_TIME_REMAINING);
+		Parameter physAddressLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ PHYS_ADDRESS);
+		Parameter hostNameLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ HOST_NAME);
+		Parameter activeLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ ACTIVE);
 		// The following implements the part of the data model related to:
 		// NonMockedDeviceFromBaseDriver.DEVICE_CATEGORY_KEY
 
-		Parameter deviceCategoryLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + DeviceFromBaseDriver.DEVICE_CATEGORY_KEY);
-
-		Parameter deviceDescriptionLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS
-				+ HOST + deviceNumberBranchIsTheServicePid + "." + DeviceFromBaseDriver.DEVICE_DESCRIPTION_KEY);
-
-		Parameter deviceSerialLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + DeviceFromBaseDriver.DEVICE_SERIAL_KEY);
+		Parameter deviceCategoryLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ DeviceFromBaseDriver.DEVICE_CATEGORY_KEY);
+		Parameter deviceDescriptionLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ DeviceFromBaseDriver.DEVICE_DESCRIPTION_KEY);
+		Parameter deviceSerialLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ DeviceFromBaseDriver.DEVICE_SERIAL_KEY);
 
 		// SERVICE_PID_KEY is equal to service.pid, but Modus/TR69 does NOT
 		// support at dot "." in a leaf's name.
@@ -482,11 +471,10 @@ public class Hosts1ProfileDataModel {
 		// deviceNumberBranch.
 		// The following line of code can NOT be displayed by Modus in the data
 		// model.
-		Parameter servicePidLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS + HOST
-				+ deviceNumberBranchIsTheServicePid + "." + DeviceFromBaseDriver.SERVICE_PID_KEY);
-
-		Parameter deviceFriendlyNameLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + HOSTS
-				+ HOST + deviceNumberBranchIsTheServicePid + "." + DeviceFromBaseDriver.DEVICE_FRIENDLY_NAME_KEY);
+		Parameter servicePidLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ DeviceFromBaseDriver.SERVICE_PID_KEY);
+		Parameter deviceFriendlyNameLeaf = pmDataService.createOrRetrieveParameter(_SERVICE_PID_ROOT
+				+ DeviceFromBaseDriver.DEVICE_FRIENDLY_NAME_KEY);
 
 		pmDataService.deleteParam(hostNumberServicePidBranch);
 		pmDataService.deleteParam(ipAddressLeaf);

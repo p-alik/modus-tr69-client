@@ -67,7 +67,7 @@ public class DevicesServiceListener implements ServiceListener {
 	}
 
 	public void serviceChanged(final ServiceEvent event) {
-		Log.info("event: " + event);
+		Log.info("DevicesServiceListener.serviceChanged event: " + event);
 
 		// System.out.println("AC1982: 3 févr. 2014 12:06:50: event: " + event);
 		// System.out.println("AC1982: 3 févr. 2014 12:07:05: event.getType(): "
@@ -92,91 +92,78 @@ public class DevicesServiceListener implements ServiceListener {
 		// o.getClass());
 
 		updateHost(event);
-
 	}
 
 	private void updateHost(ServiceEvent serviceEvent) {
-
+		Manager manager = Manager.getSingletonInstance();
 		// check if the service holds the DEVICE_CATEGORY property
 		Object deviceCategoryObject = serviceEvent.getServiceReference()
 				.getProperty(DeviceFromBaseDriver.DEVICE_CATEGORY_KEY);
 
-		if (deviceCategoryObject != null) {
+		if (deviceCategoryObject == null) {
+			Log.debug("No DEVICE_CATEGORY_KEY property. Ignore...");
+			return; // do nothing
+		}
 
-			// cast device category
-			String[] deviceCategory = null;
-			if (deviceCategoryObject instanceof String[]) {
-				deviceCategory = (String[]) deviceCategoryObject;
-			} else if (deviceCategoryObject instanceof String) {
-				deviceCategory = new String[] { (String) deviceCategoryObject };
-			} else {
-				Log.error("deviceCategory property is neither an array of String nor a String. Nothing to do...");
-				return;
+		// cast device category
+		String[] deviceCategory = null;
+		if (deviceCategoryObject instanceof String[]) {
+			deviceCategory = (String[]) deviceCategoryObject;
+		} else if (deviceCategoryObject instanceof String) {
+			deviceCategory = new String[] { (String) deviceCategoryObject };
+		} else {
+			Log.error("deviceCategory property is neither an array of String nor a String. Nothing to do...");
+			return;
+		}
+		// retrieve other properties
+		String servicePid = (String) serviceEvent.getServiceReference()
+				.getProperty(DeviceFromBaseDriver.SERVICE_PID_KEY);
+		if (servicePid == null) {
+			Log.error("service.pid is null. Nothing to do...");
+			return;
+		}
+
+		switch (serviceEvent.getType()) {
+		case ServiceEvent.REGISTERED:
+			// new service
+			// add a new Host into datamodel
+			try {
+				String deviceDescription = (String) serviceEvent.getServiceReference()
+						.getProperty(DeviceFromBaseDriver.DEVICE_DESCRIPTION_KEY);
+				String deviceSerial = (String) serviceEvent.getServiceReference()
+						.getProperty(DeviceFromBaseDriver.DEVICE_SERIAL_KEY);
+				String deviceFriendlyName = (String) serviceEvent.getServiceReference()
+						.getProperty(DeviceFromBaseDriver.DEVICE_FRIENDLY_NAME_KEY);
+				DeviceFromBaseDriver deviceFromBaseDriver = new DeviceFromBaseDriver(
+						deviceCategory, deviceDescription, deviceSerial,
+						servicePid, deviceFriendlyName);
+				Hosts1ProfileDataModel.createDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
+						this.pmDataService, deviceFromBaseDriver);
+				manager.addADevice(deviceFromBaseDriver);
+			} catch (Exception e) {
+				Log.error("unable to create a new Host", e);
 			}
-			// retrieve other properties
-			String deviceDescription = (String) serviceEvent
-					.getServiceReference().getProperty(
-							DeviceFromBaseDriver.DEVICE_DESCRIPTION_KEY);
-			String deviceSerial = (String) serviceEvent.getServiceReference()
-					.getProperty(DeviceFromBaseDriver.DEVICE_SERIAL_KEY);
-			String servicePid = (String) serviceEvent.getServiceReference()
-					.getProperty(DeviceFromBaseDriver.SERVICE_PID_KEY);
-			String deviceFriendlyName = (String) serviceEvent
-					.getServiceReference().getProperty(
-							DeviceFromBaseDriver.DEVICE_FRIENDLY_NAME_KEY);
-			
-			if (servicePid == null) {
-				Log.error("service.pid is null. Nothing to do...");
-				return;
-			}
-
-			DeviceFromBaseDriver deviceFromBaseDriver = null;
-
-			switch (serviceEvent.getType()) {
-			case ServiceEvent.REGISTERED:
-				// new service
-				// add a new Host into datamodel
+			break;
+		case ServiceEvent.MODIFIED:
+			// nothing to do
+			break;
+		case ServiceEvent.UNREGISTERING:
+			// service gone
+			// retrieve the related host and delete it
+			DeviceFromBaseDriver deviceFromBaseDriver = manager.getADevice(servicePid);
+			if (deviceFromBaseDriver != null) {
 				try {
-					deviceFromBaseDriver = new DeviceFromBaseDriver(
-							deviceCategory, deviceDescription, deviceSerial,
-							servicePid, deviceFriendlyName);
-					Hosts1ProfileDataModel
-							.createDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
-									this.pmDataService, deviceFromBaseDriver);
-					Manager.getSingletonInstance().addADevice(
-							deviceFromBaseDriver);
-				} catch (Exception e) {
-					Log.error("unable to create a new Host", e);
+					Hosts1ProfileDataModel.removeDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
+							this.pmDataService, deviceFromBaseDriver);
+					manager.removeADevice(deviceFromBaseDriver);
+				} catch (Fault e) {
+					Log.error(e.getMessage(), e);
+					throw new RuntimeException(e.getMessage(), e);
 				}
-
-				break;
-			case ServiceEvent.MODIFIED:
-				// nothing to do
-				break;
-			case ServiceEvent.UNREGISTERING:
-				// service gone
-				// retrieve the related host and delete it
-				deviceFromBaseDriver = Manager.getSingletonInstance().getADevice(servicePid);
-				if (deviceFromBaseDriver != null) {
-					try {
-						 Hosts1ProfileDataModel
-						 .removeDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
-						 this.pmDataService, deviceFromBaseDriver);
-						 Manager.getSingletonInstance().removeADevice(deviceFromBaseDriver);
-					} catch (Fault e) {
-						e.printStackTrace();
-						Log.error(e.getMessage(), e);
-						throw new RuntimeException(e.getMessage(), e);
-					}
-				}
-				break;
 			}
-			
-			// update number of entries
-			
-		} // else nothing
-		
-		
+			break;
+		}
+		// update number of entries
 	}
 
 	/**
@@ -186,72 +173,59 @@ public class DevicesServiceListener implements ServiceListener {
 	 */
 	private void updateHosts() throws NullPointerException, Fault,
 			InvalidSyntaxException {
+		Manager manager = Manager.getSingletonInstance();
 		// Update the devices internal data, and the data model.
-		List listOfDeviceFromBaseDriver = retrieveOsgiServicesDevicesRegisteredByTheBaseDrivers();
-
-		List listOfDeviceFromManager = Manager.getSingletonInstance()
-				.getDevices();
+		List devicesFromBaseDriver = retrieveOsgiServicesDevicesRegisteredByTheBaseDrivers();
+		List devicesFromManager = manager.getDevices();
 
 		// Publish devices base drivers' data to TR69 data model, if needed.
-		for (int i = 0; i < listOfDeviceFromBaseDriver.size(); i = i + 1) {
-			DeviceFromBaseDriver deviceFromBaseDriver = (DeviceFromBaseDriver) listOfDeviceFromBaseDriver
-					.get(i);
-
-			boolean deviceHasBeenFoundInManager = false;
-
+		for (Iterator itBD = devicesFromBaseDriver.iterator(); itBD.hasNext(); ) {
+			DeviceFromBaseDriver deviceFromBaseDriver = (DeviceFromBaseDriver) itBD.next();
 			// Check that this device is NOT already present.
-			for (int j = 0; j < listOfDeviceFromManager.size(); j = j + 1) {
-				DeviceFromBaseDriver device = (DeviceFromBaseDriver) listOfDeviceFromManager
-						.get(j);
-				if (deviceFromBaseDriver.getServicePid().equals(
-						device.getServicePid())) {
+			boolean foundInManager = false;
+			for (Iterator itM = devicesFromManager.iterator(); itM.hasNext(); ) {
+				DeviceFromBaseDriver device = (DeviceFromBaseDriver) itM.next();
+				if (deviceFromBaseDriver.getServicePid().equals(device.getServicePid())) {
+					foundInManager = true;
 					break;
 				}
 			}
-
-			if (!(deviceHasBeenFoundInManager)) {
-				Hosts1ProfileDataModel
-						.createDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
-								this.pmDataService, deviceFromBaseDriver);
-				Manager.getSingletonInstance().addADevice(deviceFromBaseDriver);
+			if (! foundInManager) {
+				// new device! Create it in data model
+				Hosts1ProfileDataModel.createDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
+						this.pmDataService, deviceFromBaseDriver);
+				manager.addADevice(deviceFromBaseDriver);
 			}
 		}
 
 		// Let's search, and find the removed devices.
-		Iterator devicesIterator = listOfDeviceFromManager.iterator();
-		while (devicesIterator.hasNext()) {
-			DeviceFromBaseDriver device = (DeviceFromBaseDriver) devicesIterator
-					.next();
-			boolean deviceHasBeenFoundInBundleContext = false;
-			for (int i = 0; i < listOfDeviceFromBaseDriver.size(); i = i + 1) {
-				DeviceFromBaseDriver d = (DeviceFromBaseDriver) listOfDeviceFromBaseDriver
-						.get(i);
-				if (device.getServicePid() == d.getServicePid()) {
-					deviceHasBeenFoundInBundleContext = true;
+		for (Iterator itM = devicesFromManager.iterator(); itM.hasNext(); ) {
+			DeviceFromBaseDriver device = (DeviceFromBaseDriver) itM.next();
+			boolean foundInBundleContext = false;
+			for (Iterator itBD = devicesFromBaseDriver.iterator(); itBD.hasNext(); ) {
+				DeviceFromBaseDriver d = (DeviceFromBaseDriver) itBD.next();
+				if (device.getServicePid().equals(d.getServicePid())) {
+					foundInBundleContext = true;
 					break;
 				}
 			}
 
-			if (!(deviceHasBeenFoundInBundleContext)) {
+			if (! foundInBundleContext) {
 				// Here, it means that the device is NO longer present.
 				// Let's update the data model accordingly.
 				try {
-					Hosts1ProfileDataModel
-							.removeDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
-									this.pmDataService, device);
-					Manager.getSingletonInstance().removeADevice(device);
+					Hosts1ProfileDataModel.removeDeviceFromBaseDriverNumberBranchAndRelatedLeafsDatamodel(
+							this.pmDataService, device);
+					manager.removeADevice(device);
 				} catch (Fault e) {
-					e.printStackTrace();
 					Log.error(e.getMessage(), e);
 					throw new RuntimeException(e.getMessage(), e);
 				}
 			} // no "else" needed.
 		}
 
-		// As a consequence, the value of Device.Hosts.HostNumberOfEntries is
-		// updated.
-		Integer devicesNumberOfEntries = new Integer(Manager
-				.getSingletonInstance().getDevices().size() + 1);
+		// As a consequence, the value of Device.Hosts.HostNumberOfEntries is updated.
+		Integer devicesNumberOfEntries = new Integer(manager.getDevices().size() + 1);
 		Parameter devicesNumberOfEntriesLeaf = this.pmDataService
 				.createOrRetrieveParameter(this.pmDataService.getRoot()
 						+ Hosts1ProfileDataModel.HOSTS
@@ -261,38 +235,33 @@ public class DevicesServiceListener implements ServiceListener {
 
 	public static List retrieveOsgiServicesDevicesRegisteredByTheBaseDrivers() {
 		List listOfDeviceFromBaseDriver = new ArrayList();
-
 		try {
-			ServiceReference[] srs = BUNDLE_CONTEXT.getAllServiceReferences(
-					null, null);
-			for (int i = 0; i < srs.length; i = i + 1) {
-				ServiceReference sr = srs[i];
+			ServiceReference[] srs = BUNDLE_CONTEXT.getAllServiceReferences(null, null);
+			for (int idx = 0; idx < srs.length; idx++) {
+				ServiceReference sr = srs[idx];
 				Log.debug("Let's have a look on the serviceReference number: "
-						+ i + " that is related to the bundleId: "
+						+ idx + " that is related to the bundleId: "
 						+ sr.getBundle().getBundleId());
 
+				Object devCategory = sr.getProperty(DeviceFromBaseDriver.DEVICE_CATEGORY_KEY);
+				if (devCategory == null) {
+					Log.debug("The serviceReference number: " + idx
+							+ " does NOT have DEVICE_CATEGORY property. As a consequence, this serviceReference is ignored. Its service's properties are: "
+							+ sr.getPropertyKeys());
+					return listOfDeviceFromBaseDriver;
+				}
 				String[] deviceCategory = null;
-				try {
-					deviceCategory = (String[]) sr
-							.getProperty(DeviceFromBaseDriver.DEVICE_CATEGORY_KEY);
-				} catch (ClassCastException e) {
-					Log.debug("As debug info for the serviceReference number: "
-							+ i
-							+ ". Exception message: "
-							+ e.getMessage()
-							+ ". This service reference is non compliant. Now, let's try to cast this DEVICE_CATEGORY property to String in order to support current ZBBD implem.");
-					try {
-						String deviceCategoryAsAString = (String) sr
-								.getProperty(DeviceFromBaseDriver.DEVICE_CATEGORY_KEY);
-						deviceCategory = new String[1];
-						deviceCategory[0] = deviceCategoryAsAString;
-					} catch (ClassCastException e2) {
-						Log.error(
-								"The DEVICE_CATEGORY property (...) of this serviceReference (number:"
-										+ i
-										+ ") is neither a String[] (,  nor a String. This service reference is non compliant, and, as a consequence, it is rejected.",
-								e2);
-					}
+				if (devCategory instanceof String[]) {
+					deviceCategory = (String[]) devCategory;
+				} else if (devCategory instanceof String) {
+					Log.debug("As debug info for the serviceReference number: " + idx
+							+ ". This service reference is non compliant. Now, however we can cast cast this DEVICE_CATEGORY property to String in order to support current ZBBD implem.");
+					deviceCategory = new String[1];
+					deviceCategory[0] = (String) devCategory;
+				} else {
+					Log.error("The DEVICE_CATEGORY property (...) of this serviceReference (number:"
+						+ idx + ") is neither a String[] (,  nor a String. This service reference is non compliant, and, as a consequence, it is rejected.");
+					return listOfDeviceFromBaseDriver;
 				}
 
 				String deviceDescription = (String) sr
@@ -304,31 +273,20 @@ public class DevicesServiceListener implements ServiceListener {
 				String deviceFriendlyName = (String) sr
 						.getProperty(DeviceFromBaseDriver.DEVICE_FRIENDLY_NAME_KEY);
 
-				if (deviceCategory == null) {
-					Log.debug("The serviceReference number: "
-							+ i
-							+ " does NOT have DEVICE_CATEGORY property. As a consequence, this serviceReference is ignored. Its service's properties are: "
-							+ sr.getPropertyKeys());
-				} else {
-					Log.debug("The serviceReference number: "
-							+ i
-							+ " has DEVICE_CATEGORY property. As a consequence, let's try to take it into account.");
-					try {
-						listOfDeviceFromBaseDriver
-								.add(new DeviceFromBaseDriver(deviceCategory,
-										deviceDescription, deviceSerial,
-										servicePid, deviceFriendlyName));
-					} catch (Exception e) {
-						Log.error(
-								"This serviceReference is NOT compliant (so it is rejected).",
-								e);
-					}
+				Log.debug("The serviceReference number: " + idx
+						+ " has DEVICE_CATEGORY property. As a consequence, let's try to take it into account.");
+				try {
+					listOfDeviceFromBaseDriver.add(new DeviceFromBaseDriver(deviceCategory,
+							deviceDescription, deviceSerial,
+							servicePid, deviceFriendlyName));
+				} catch (Exception e) {
+					Log.error("This serviceReference is NOT compliant (so it is rejected).", e);
 				}
 			}
 		} catch (InvalidSyntaxException e) {
 			Log.error(e.getMessage(), e);
 		}
-
 		return listOfDeviceFromBaseDriver;
 	}
+	
 }

@@ -76,4 +76,5 @@ public final class Activator implements BundleActivator {
 		bundleContext.removeBundleListener(this.duAndEuEventListener);
 		this.pmDataSvc = null;
 	}
+	
 }

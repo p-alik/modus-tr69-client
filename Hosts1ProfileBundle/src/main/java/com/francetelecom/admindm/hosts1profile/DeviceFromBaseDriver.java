@@ -71,29 +71,25 @@ public class DeviceFromBaseDriver {
 		if (deviceCategory == null) {
 			throw new Exception("deviceCategory can NOT be null");
 		}
-		this.deviceCategory = deviceCategory;
-
 		if (deviceDescription == null) {
 			throw new Exception("deviceDescription can NOT be null");
 		}
-		this.deviceDescription = deviceDescription;
-
 		if (deviceSerial == null) {
 			throw new Exception("deviceSerial can NOT be null");
 		}
-		this.deviceSerial = deviceSerial;
-
-		if (servicePid == null) {
-			throw new Exception("servicePid can NOT be null");
-		} else if (contains(servicePid, ".")) {
-			throw new Exception("servicePid can NOT contain \".\" due to TR069/Modus constraints.");
-		} else {
-			this.servicePid = servicePid;
-		}
-
 		if (deviceFriendlyName == null) {
 			throw new Exception("deviceFriendlyName can NOT be null");
 		}
+		if (servicePid == null) {
+			throw new Exception("servicePid can NOT be null");
+		} else if (servicePid.indexOf(".") >= 0) {
+			throw new Exception("servicePid can NOT contain \".\" due to TR069/Modus constraints.");
+		}
+
+		this.deviceCategory = deviceCategory;
+		this.deviceDescription = deviceDescription;
+		this.deviceSerial = deviceSerial;
+		this.servicePid = servicePid;
 		this.deviceFriendlyName = deviceFriendlyName;
 	}
 
@@ -117,41 +113,17 @@ public class DeviceFromBaseDriver {
 		return this.deviceFriendlyName;
 	}
 
-	/**
-	 * @param s
-	 * @param s2
-	 * @return true if s contains s2, false otherwise (e.g. if s is null, or if s2 is null, or if s does not contain
-	 *         s2).
-	 */
-	private boolean contains(String s, String s2) {
-		if (s == null) {
-			return false;
-		} else {
-			if (s2 == null) {
-				return false;
-			} else {
-				return s.indexOf(s2.toString()) > -1;
-			}
-		}
-	}
-
 	public String toString() {
 		String deviceCategoryAsAString = null;
-		if (this.deviceCategory == null) {
-			deviceCategoryAsAString = null;
-		} else {
-			int length = this.deviceCategory.length;
-			for (int i = 0; i < length; i = i + 1) {
-				if (i == 0) {
-					deviceCategoryAsAString = deviceCategory[i];
-				} else {
-					deviceCategoryAsAString = deviceCategoryAsAString + ";;" + deviceCategory[i];
-				}
+		if ((deviceCategory != null) && (deviceCategory.length > 0)) {
+			deviceCategoryAsAString = deviceCategory[0];
+			for (int i = 1; i < deviceCategory.length; i = i + 1) {
+				deviceCategoryAsAString += ";;" + deviceCategory[i];
 			}
 		}
-
-		return "" + DeviceFromBaseDriver.class.getName() + "[deviceCategory=" + deviceCategoryAsAString
+		return DeviceFromBaseDriver.class.getName() + "[deviceCategory=" + deviceCategoryAsAString
 				+ ",deviceDescription=" + this.deviceDescription + ",deviceSerial=" + this.deviceSerial
 				+ ",servicePid=" + this.servicePid + ",deviceFriendlyName=" + this.deviceFriendlyName + "]";
 	}
+	
 }

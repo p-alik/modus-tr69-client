@@ -29,15 +29,11 @@ import org.osgi.framework.BundleException;
 import com.francetelecom.admindm.api.Log;
 import com.francetelecom.admindm.api.Setter;
 import com.francetelecom.admindm.model.Parameter;
+import com.francetelecom.admindm.sm_baseline1profile.utils.Utils;
 import com.francetelecom.admindm.soap.Fault;
 import com.francetelecom.admindm.soap.FaultUtil;
 
 public class ExecutionUnitResquestedStateSetter implements Setter {
-
-	/** @see TR181 i2 a6 */
-	private static final String IDLE = "Idle";
-	/** @see TR181 i2 a6 */
-	private static final String ACTIVE = "Active";
 
 	private long euid;
 	private BundleContext bundleContext;
@@ -56,35 +52,33 @@ public class ExecutionUnitResquestedStateSetter implements Setter {
 		// Log.debug("ExecutionUnitResquestedStateSetter's set: param: " + param
 		// + ", obj: " + obj + ".");
 		try {
-			if (IDLE.equals(obj)) {
-				Bundle b = this.bundleContext.getBundle(this.euid);
-				if (b == null) {
-					StringBuffer error = new StringBuffer(FaultUtil.STR_FAULT_9001);
-					error.append(": The bundle associated to the given EUID can NOT be found.");
-					throw new Fault(FaultUtil.FAULT_9001, error.toString());
+			if (Utils.IDLE.equals(obj)) {
+				Bundle bundle = this.bundleContext.getBundle(this.euid);
+				if (bundle == null) {
+					throw new Fault(FaultUtil.FAULT_9001, FaultUtil.STR_FAULT_9001 
+							+ ": The bundle associated to the given EUID can NOT be found.");
 				} else {
-					b.stop();
+					bundle.stop();
 				}
-			} else if (ACTIVE.equals(obj)) {
-				Bundle b = this.bundleContext.getBundle(this.euid);
-				if (b == null) {
-					StringBuffer error = new StringBuffer(FaultUtil.STR_FAULT_9001);
-					error.append(": The bundle associated to the given EUID can NOT be found.");
-					throw new Fault(FaultUtil.FAULT_9001, error.toString());
+			} else if (Utils.ACTIVE.equals(obj)) {
+				Bundle bundle = this.bundleContext.getBundle(this.euid);
+				if (bundle == null) {
+					throw new Fault(FaultUtil.FAULT_9001, FaultUtil.STR_FAULT_9001
+							+ ": The bundle associated to the given EUID can NOT be found.");
 				} else {
-					b.start();
+					bundle.start();
 				}
 			} else if ("".equals(obj)) {
 				// Log.debug("obj is: \"\". There is nothing to do, here.");
 			} else {
-				StringBuffer error = new StringBuffer(FaultUtil.STR_FAULT_9003);
-				error.append(": " + IDLE + ", or " + ACTIVE + " are only allowed values.");
-				throw new Fault(FaultUtil.FAULT_9003, error.toString());
+				throw new Fault(FaultUtil.FAULT_9003, FaultUtil.STR_FAULT_9003
+						+ ": " + Utils.IDLE + ", or " + Utils.ACTIVE 
+						+ " are only allowed values.");
 			}
 		} catch (BundleException e) {
-			StringBuffer error = new StringBuffer(FaultUtil.STR_FAULT_9001);
-			error.append(": " + e.getLocalizedMessage());
-			throw new Fault(FaultUtil.FAULT_9001, error.toString(), e);
+			throw new Fault(FaultUtil.FAULT_9001, 
+					FaultUtil.STR_FAULT_9001 + ": " + e.getLocalizedMessage(), e);
 		}
 	}
+	
 }

@@ -37,6 +37,20 @@ import com.francetelecom.admindm.soap.Fault;
 
 public class Utils {
 
+	/** @see TR181 i2 a6 */
+	public static final String IDLE = "Idle";
+	/** @see TR181 i2 a6 */
+	public static final String ACTIVE = "Active";
+	
+	public static final String UNINSTALLED = "Uninstalled";
+	public static final String INSTALLED = "Installed";
+	public static final String STARTING = "Starting";
+	public static final String STOPPING = "Stopping";
+	
+	public static final String BUNDLE_NAME = "Bundle-Name";
+	public static final String BUNDLE_VENDOR = "Bundle-Vendor";
+	public static final String BUNDLE_VERSION = "Bundle-Version";
+
 	/**
 	 * @param pmDataService
 	 * @param du
@@ -44,15 +58,16 @@ public class Utils {
 	 */
 	public static void createDeploymentUnitNumberBranchAndRelatedLeafsDatamodel(final IParameterData pmDataService,
 			final DeploymentUnit du) throws Fault {
-		Parameter deploymentUnitNumberBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
+		final String _UUID_ROOT = pmDataService.getRoot()
 				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + ".");
+				+ du.getUuid() + ".";
+		
+		Parameter deploymentUnitNumberBranch = pmDataService.createOrRetrieveParameter(_UUID_ROOT);
 		deploymentUnitNumberBranch.setType(ParameterType.ANY);
 
 		// uuid
-		Parameter uuidLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.UUID);
+		Parameter uuidLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.UUID);
 		uuidLeaf.setType(ParameterType.STRING);
 		uuidLeaf.setStorageMode(StorageMode.COMPUTED);
 		uuidLeaf.setWritable(false);
@@ -62,9 +77,8 @@ public class Utils {
 		uuidLeaf.setValue(Long.toString(du.getUuid()));
 
 		// duid
-		Parameter duidLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.DUID);
+		Parameter duidLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.DUID);
 		duidLeaf.setType(ParameterType.STRING);
 		duidLeaf.setStorageMode(StorageMode.COMPUTED);
 		duidLeaf.setWritable(false);
@@ -74,9 +88,8 @@ public class Utils {
 		duidLeaf.setValue(Long.toString(du.getDuid()));
 
 		// name
-		Parameter nameLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.NAME_IN_DEPLOYMENT_UNIT);
+		Parameter nameLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.NAME_IN_DEPLOYMENT_UNIT);
 		nameLeaf.setType(ParameterType.STRING);
 		nameLeaf.setStorageMode(StorageMode.COMPUTED);
 		nameLeaf.setWritable(false);
@@ -86,9 +99,8 @@ public class Utils {
 		nameLeaf.setValue(du.getName());
 
 		// status
-		Parameter statusLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.STATUS_IN_DEPLOYMENT_UNIT);
+		Parameter statusLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.STATUS_IN_DEPLOYMENT_UNIT);
 		statusLeaf.setType(ParameterType.STRING);
 		statusLeaf.setStorageMode(StorageMode.COMPUTED);
 		statusLeaf.setWritable(false);
@@ -97,9 +109,8 @@ public class Utils {
 		statusLeaf.setValue(du.getStatusAsAString());
 
 		// resolved
-		Parameter resolvedLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.RESOLVED);
+		Parameter resolvedLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.RESOLVED);
 		resolvedLeaf.setType(ParameterType.BOOLEAN);
 		resolvedLeaf.setStorageMode(StorageMode.COMPUTED);
 		resolvedLeaf.setWritable(false);
@@ -108,9 +119,8 @@ public class Utils {
 		resolvedLeaf.setValue(du.getResolved());
 
 		// url
-		Parameter urlLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.URL);
+		Parameter urlLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.URL);
 		urlLeaf.setType(ParameterType.STRING);
 		urlLeaf.setStorageMode(StorageMode.COMPUTED);
 		urlLeaf.setWritable(false);
@@ -120,9 +130,8 @@ public class Utils {
 		urlLeaf.setValue(du.getUrl());
 
 		// vendor
-		Parameter vendorLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.VENDOR_IN_DEPLOYMENT_UNIT);
+		Parameter vendorLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.VENDOR_IN_DEPLOYMENT_UNIT);
 		vendorLeaf.setType(ParameterType.STRING);
 		vendorLeaf.setStorageMode(StorageMode.COMPUTED);
 		vendorLeaf.setWritable(false);
@@ -132,9 +141,8 @@ public class Utils {
 		vendorLeaf.setValue(du.getVendor());
 
 		// version
-		Parameter versionLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.VERSION_IN_DEPLOYMENT_UNIT);
+		Parameter versionLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.VERSION_IN_DEPLOYMENT_UNIT);
 		versionLeaf.setType(ParameterType.STRING);
 		versionLeaf.setStorageMode(StorageMode.COMPUTED);
 		versionLeaf.setWritable(false);
@@ -144,9 +152,8 @@ public class Utils {
 		versionLeaf.setValue(du.getVersion());
 
 		// executionUnitList
-		Parameter executionUnitListLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.EXECUTION_UNIT_LIST);
+		Parameter executionUnitListLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EXECUTION_UNIT_LIST);
 		executionUnitListLeaf.setType(ParameterType.STRING);
 		executionUnitListLeaf.setStorageMode(StorageMode.COMPUTED);
 		executionUnitListLeaf.setWritable(false);
@@ -155,9 +162,8 @@ public class Utils {
 		executionUnitListLeaf.setValue(du.getExecutionUnitList());
 
 		// executionEnvRef
-		Parameter executionEnvRefLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.EXECUTION_ENV_REF);
+		Parameter executionEnvRefLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EXECUTION_ENV_REF);
 		executionEnvRefLeaf.setType(ParameterType.STRING);
 		executionEnvRefLeaf.setStorageMode(StorageMode.COMPUTED);
 		executionEnvRefLeaf.setWritable(false);
@@ -175,61 +181,52 @@ public class Utils {
 	 */
 	public static void updateDeploymentUnitNumberBranchAndRelatedLeafsDatamodel(final IParameterData pmDataService,
 			final DeploymentUnit du) throws Fault {
-		// uuid
-		Parameter uuidLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
+		final String _UUID_ROOT = pmDataService.getRoot()
 				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.UUID);
+				+ du.getUuid() + ".";
+		// uuid
+		Parameter uuidLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.UUID);
 
 		// duid
-		Parameter duidLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.DUID);
+		Parameter duidLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.DUID);
 
 		// name
-		Parameter nameLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.NAME_IN_DEPLOYMENT_UNIT);
+		Parameter nameLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.NAME_IN_DEPLOYMENT_UNIT);
 
 		// status
-		Parameter statusLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.STATUS_IN_DEPLOYMENT_UNIT);
+		Parameter statusLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.STATUS_IN_DEPLOYMENT_UNIT);
 
 		// resolved
-		Parameter resolvedLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.RESOLVED);
+		Parameter resolvedLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.RESOLVED);
 
 		// url
-		Parameter urlLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.URL);
+		Parameter urlLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.URL);
 
 		// vendor
-		Parameter vendorLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.VENDOR_IN_DEPLOYMENT_UNIT);
+		Parameter vendorLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.VENDOR_IN_DEPLOYMENT_UNIT);
 
 		// version
-		Parameter versionLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.VERSION_IN_DEPLOYMENT_UNIT);
+		Parameter versionLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.VERSION_IN_DEPLOYMENT_UNIT);
 
 		// executionUnitList
-		Parameter executionUnitListLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.EXECUTION_UNIT_LIST);
+		Parameter executionUnitListLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EXECUTION_UNIT_LIST);
 
 		// executionEnvRef
-		Parameter executionEnvRefLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-				+ du.getUuid() + "." + SM_Baseline1ProfileDataModel.EXECUTION_ENV_REF);
+		Parameter executionEnvRefLeaf = pmDataService.createOrRetrieveParameter(_UUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EXECUTION_ENV_REF);
 
-		if ("Uninstalled".equals(du.getStatusAsAString())) {
+		if (UNINSTALLED.equals(du.getStatusAsAString())) {
 
-			Parameter deploymentUnitNumberBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-					+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT
-					+ du.getUuid() + ".");
+			Parameter deploymentUnitNumberBranch = pmDataService.createOrRetrieveParameter(_UUID_ROOT);
 			pmDataService.deleteParam(deploymentUnitNumberBranch);
 
 			pmDataService.deleteParam(uuidLeaf);
@@ -267,15 +264,15 @@ public class Utils {
 	 */
 	public static void createExecutionUnitNumberBranchAndRelatedLeafsDatamodel(final IParameterData pmDataService,
 			final BundleContext bundleContext, final ExecutionUnit eu) throws Fault {
-		Parameter executionUnitNumberBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
+		final String _EUID_ROOT = pmDataService.getRoot()
 				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + ".");
+				+ eu.getEuid() + ".";
+		Parameter executionUnitNumberBranch = pmDataService.createOrRetrieveParameter(_EUID_ROOT);
 		executionUnitNumberBranch.setType(ParameterType.ANY);
 
 		// EUID
-		Parameter euidLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.EUID);
+		Parameter euidLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EUID);
 		euidLeaf.setType(ParameterType.STRING);
 		euidLeaf.setStorageMode(StorageMode.COMPUTED);
 		euidLeaf.setWritable(false);
@@ -285,9 +282,8 @@ public class Utils {
 		euidLeaf.setValue(Long.toString(eu.getEuid()));
 
 		// Name
-		Parameter nameLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.NAME_IN_EXECUTION_UNIT);
+		Parameter nameLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.NAME_IN_EXECUTION_UNIT);
 		nameLeaf.setType(ParameterType.STRING);
 		nameLeaf.setStorageMode(StorageMode.COMPUTED);
 		nameLeaf.setWritable(false);
@@ -297,9 +293,8 @@ public class Utils {
 		nameLeaf.setValue(eu.getName());
 
 		// ExecEnvLabel
-		Parameter execEnvLabelLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.EXEC_ENV_LABEL);
+		Parameter execEnvLabelLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EXEC_ENV_LABEL);
 		execEnvLabelLeaf.setType(ParameterType.STRING);
 		execEnvLabelLeaf.setStorageMode(StorageMode.COMPUTED);
 		execEnvLabelLeaf.setWritable(false);
@@ -309,9 +304,8 @@ public class Utils {
 		execEnvLabelLeaf.setValue(eu.getExecEnvLabel());
 
 		// Status
-		Parameter statusLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.STATUS_IN_EXECUTION_UNIT);
+		Parameter statusLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.STATUS_IN_EXECUTION_UNIT);
 		statusLeaf.setType(ParameterType.STRING);
 		statusLeaf.setStorageMode(StorageMode.COMPUTED);
 		statusLeaf.setWritable(false);
@@ -320,24 +314,22 @@ public class Utils {
 		statusLeaf.setValue(eu.getStatusAsAString());
 
 		// RequestedState
-		Parameter requestedStateLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.REQUESTED_STATE);
+		Parameter requestedStateLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.REQUESTED_STATE);
 		requestedStateLeaf.setType(ParameterType.STRING);
 		requestedStateLeaf.setStorageMode(StorageMode.COMPUTED);
 		requestedStateLeaf.setNotification(0);
 		requestedStateLeaf.setActiveNotificationDenied(false);
 		requestedStateLeaf.setImmediateChanges(true);
 		requestedStateLeaf.setValue(eu.getRequestedState());
-		ExecutionUnitResquestedStateSetter executionUnitResquestedStateSetter = new ExecutionUnitResquestedStateSetter(
-				eu.getEuid(), bundleContext);
+		ExecutionUnitResquestedStateSetter executionUnitResquestedStateSetter = 
+				new ExecutionUnitResquestedStateSetter(eu.getEuid(), bundleContext);
 		requestedStateLeaf.setSetter(executionUnitResquestedStateSetter);
 		requestedStateLeaf.setWritable(true);
 
 		// ExecutionFaultCode
-		Parameter executionFaultCodeLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.EXECUTION_FAULT_CODE);
+		Parameter executionFaultCodeLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EXECUTION_FAULT_CODE);
 		executionFaultCodeLeaf.setType(ParameterType.STRING);
 		executionFaultCodeLeaf.setStorageMode(StorageMode.COMPUTED);
 		executionFaultCodeLeaf.setWritable(false);
@@ -346,9 +338,8 @@ public class Utils {
 		executionFaultCodeLeaf.setValue(eu.getExecutionFaultCode());
 
 		// ExecutionFaultMessage
-		Parameter executionFaultMessageLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.EXECUTION_FAULT_MESSAGE);
+		Parameter executionFaultMessageLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EXECUTION_FAULT_MESSAGE);
 		executionFaultMessageLeaf.setType(ParameterType.STRING);
 		executionFaultMessageLeaf.setStorageMode(StorageMode.COMPUTED);
 		executionFaultMessageLeaf.setWritable(false);
@@ -358,9 +349,8 @@ public class Utils {
 		executionFaultMessageLeaf.setValue(eu.getExecutionFaultMessage());
 
 		// Vendor
-		Parameter vendorLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.VENDOR_IN_EXECUTION_UNIT);
+		Parameter vendorLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.VENDOR_IN_EXECUTION_UNIT);
 		vendorLeaf.setType(ParameterType.STRING);
 		vendorLeaf.setStorageMode(StorageMode.COMPUTED);
 		vendorLeaf.setWritable(false);
@@ -370,9 +360,8 @@ public class Utils {
 		vendorLeaf.setValue(eu.getVendor());
 
 		// Version
-		Parameter versionLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.VERSION_IN_EXECUTION_UNIT);
+		Parameter versionLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.VERSION_IN_EXECUTION_UNIT);
 		versionLeaf.setType(ParameterType.STRING);
 		versionLeaf.setStorageMode(StorageMode.COMPUTED);
 		versionLeaf.setWritable(false);
@@ -382,9 +371,8 @@ public class Utils {
 		versionLeaf.setValue(eu.getVersion());
 
 		// References
-		Parameter referencesLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.REFERENCES);
+		Parameter referencesLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.REFERENCES);
 		referencesLeaf.setType(ParameterType.STRING);
 		referencesLeaf.setStorageMode(StorageMode.COMPUTED);
 		referencesLeaf.setWritable(false);
@@ -393,9 +381,8 @@ public class Utils {
 		referencesLeaf.setValue(eu.getReferences());
 
 		// SupportedDataModelList
-		Parameter supportedDataModelListLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.SUPPORTED_DATA_MODEL_LIST);
+		Parameter supportedDataModelListLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.SUPPORTED_DATA_MODEL_LIST);
 		supportedDataModelListLeaf.setType(ParameterType.STRING);
 		supportedDataModelListLeaf.setStorageMode(StorageMode.COMPUTED);
 		supportedDataModelListLeaf.setWritable(false);
@@ -403,11 +390,9 @@ public class Utils {
 		supportedDataModelListLeaf.setActiveNotificationDenied(false);
 		supportedDataModelListLeaf.setValue(eu.getSupportedDataModelList());
 
-		Parameter extentionsBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.EXTENSIONS);
+		Parameter extentionsBranch = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EXTENSIONS);
 		extentionsBranch.setType(ParameterType.ANY);
-
 	}
 
 	/**
@@ -419,70 +404,59 @@ public class Utils {
 	 */
 	public static void updateExecutionUnitNumberBranchAndRelatedLeafsDatamodel(final IParameterData pmDataService,
 			final ExecutionUnit eu) throws Fault {
+		final String _EUID_ROOT = pmDataService.getRoot()
+				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
+				+ eu.getEuid() + ".";
 
 		// EUID
-		Parameter euidLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.EUID);
+		Parameter euidLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EUID);
 
 		// Name
-		Parameter nameLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.NAME_IN_EXECUTION_UNIT);
+		Parameter nameLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.NAME_IN_EXECUTION_UNIT);
 
 		// ExecEnvLabel
-		Parameter execEnvLabelLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.EXEC_ENV_LABEL);
+		Parameter execEnvLabelLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EXEC_ENV_LABEL);
 		// Status
-		Parameter statusLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.STATUS_IN_EXECUTION_UNIT);
+		Parameter statusLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.STATUS_IN_EXECUTION_UNIT);
 
 		// RequestedState
-		Parameter requestedStateLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.REQUESTED_STATE);
+		Parameter requestedStateLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.REQUESTED_STATE);
 
 		// ExecutionFaultCode
-		Parameter executionFaultCodeLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.EXECUTION_FAULT_CODE);
+		Parameter executionFaultCodeLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EXECUTION_FAULT_CODE);
 
 		// ExecutionFaultMessage
-		Parameter executionFaultMessageLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.EXECUTION_FAULT_MESSAGE);
+		Parameter executionFaultMessageLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EXECUTION_FAULT_MESSAGE);
 
 		// Vendor
-		Parameter vendorLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.VENDOR_IN_EXECUTION_UNIT);
+		Parameter vendorLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.VENDOR_IN_EXECUTION_UNIT);
 
 		// Version
-		Parameter versionLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.VERSION_IN_EXECUTION_UNIT);
+		Parameter versionLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.VERSION_IN_EXECUTION_UNIT);
 
 		// References
-		Parameter referencesLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.REFERENCES);
+		Parameter referencesLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.REFERENCES);
 
 		// SupportedDataModelList
-		Parameter supportedDataModelListLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.SUPPORTED_DATA_MODEL_LIST);
+		Parameter supportedDataModelListLeaf = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.SUPPORTED_DATA_MODEL_LIST);
 
-		Parameter extentionsBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-				+ eu.getEuid() + "." + SM_Baseline1ProfileDataModel.EXTENSIONS);
+		Parameter extentionsBranch = pmDataService.createOrRetrieveParameter(_EUID_ROOT
+				+ SM_Baseline1ProfileDataModel.EXTENSIONS);
 
-		if ("Uninstalled".equals(eu.getStatusAsAString())) {
+		if (UNINSTALLED.equals(eu.getStatusAsAString())) {
 
-			Parameter executionUnitNumberBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-					+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES + SM_Baseline1ProfileDataModel.EXECUTION_UNIT
-					+ eu.getEuid() + ".");
+			Parameter executionUnitNumberBranch = pmDataService.createOrRetrieveParameter(_EUID_ROOT);
 			pmDataService.deleteParam(executionUnitNumberBranch);
 
 			pmDataService.deleteParam(euidLeaf);
@@ -526,4 +500,5 @@ public class Utils {
 			supportedDataModelListLeaf.setValue(eu.getSupportedDataModelList());
 		}
 	}
+
 }

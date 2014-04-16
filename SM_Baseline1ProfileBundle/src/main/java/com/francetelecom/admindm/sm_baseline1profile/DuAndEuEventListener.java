@@ -44,30 +44,27 @@ public class DuAndEuEventListener implements BundleListener {
 
 	private BundleContext bundleContext;
 	private IParameterData pmDataService;
+	private Manager manager;
 
 	/** */
 	public DuAndEuEventListener(final BundleContext bundleContext,
 			final IParameterData pmDataService) {
 		this.bundleContext = bundleContext;
 		this.pmDataService = pmDataService;
-		
+		manager = Manager.getSingletonInstance();
 		try {
 			updateDUs();
 			updateEUs();
 		} catch (NullPointerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.error("Error init DuAndEuEventListener", e);
 		} catch (Fault e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.error("Fault init DuAndEuEventListener", e);
 		}
 		
 	}
 
 	public void bundleChanged(final BundleEvent event) {
-		Log.info("event: " + event);
-		Log.info("event.getBundle(): " + event.getBundle());
-		Log.info("event.getSource(): " + event.getSource());
+		Log.info("DuAndEuEventListener.bundleChanged event: " + event);
 		// int org.osgi.framework.BundleEvent.getType()
 		// event.INSTALLED -> 1
 		// event.STARTED -> 2
@@ -96,7 +93,6 @@ public class DuAndEuEventListener implements BundleListener {
 //		} catch (Fault e) {
 //			Log.error(e.getMessage(), e);
 //		}
-
 	}
 
 	/**
@@ -105,52 +101,39 @@ public class DuAndEuEventListener implements BundleListener {
 	 * @param bundleEvent
 	 *            bundle event
 	 */
-	private void updateDU(BundleEvent bundleEvent) {
-
+	private void updateDU(final BundleEvent bundleEvent) {
 		Bundle bundle = bundleEvent.getBundle();
-		DeploymentUnit du = null;
 		boolean updateDUNumber = false;
+		Log.debug("DuAndEuEventListener.updateDU " + bundleEvent);
 
 		switch (bundleEvent.getType()) {
-		case BundleEvent.INSTALLED:
+		case BundleEvent.INSTALLED: {
 			// a new bundle has been installed
-			// create a new DeploymentUnit and add it into the data model and
-			// the manager
-			du = new DeploymentUnit(bundle);
+			// create a new DeploymentUnit and add it into the data model and the manager
+			DeploymentUnit du = new DeploymentUnit(bundle);
+			Log.info("created du " + du);
 			try {
 				Utils.createDeploymentUnitNumberBranchAndRelatedLeafsDatamodel(
 						this.pmDataService, du);
 			} catch (Fault e) {
-				e.printStackTrace();
 				Log.error(e.getMessage(), e);
 				throw new RuntimeException(e.getMessage(), e);
 			}
-			Manager.getSingletonInstance().getDeploymentUnits().add(du);
+			manager.addADeploymentUnit(du);
 			updateDUNumber = true;
 			break;
+		}
 		case BundleEvent.UPDATED:
 		case BundleEvent.STARTED:
 			// case BundleEvent.STARTING:
 		case BundleEvent.STOPPED:
 			// case BundleEvent.STOPPING:
 		case BundleEvent.RESOLVED:
-		case BundleEvent.UNRESOLVED:
+		case BundleEvent.UNRESOLVED: {
 			// a bundle has been updated
 			// find out its related DeploymentUnit and update it
-			updateDUNumber = false;
-			du = Manager.getSingletonInstance().getDeploymentUnit(
-					bundle.getBundleId());
-			if (du != null) {
-				du.updateDeploymentUnit(bundle);
-				try {
-					Utils.updateDeploymentUnitNumberBranchAndRelatedLeafsDatamodel(
-							this.pmDataService, du);
-				} catch (Fault e) {
-					e.printStackTrace();
-					Log.error(e.getMessage(), e);
-					throw new RuntimeException(e.getMessage(), e);
-				}
-			} else {
+			DeploymentUnit du = manager.getDeploymentUnit(bundle.getBundleId());
+			if (du == null) {
 				// something wrong as the du should exists
 				// try to create the DU to recover to a valid situation
 				du = new DeploymentUnit(bundle);
@@ -158,59 +141,63 @@ public class DuAndEuEventListener implements BundleListener {
 					Utils.createDeploymentUnitNumberBranchAndRelatedLeafsDatamodel(
 							this.pmDataService, du);
 				} catch (Fault e) {
-					e.printStackTrace();
 					Log.error(e.getMessage(), e);
 					throw new RuntimeException(e.getMessage(), e);
 				}
-				Manager.getSingletonInstance().getDeploymentUnits().add(du);
+				manager.addADeploymentUnit(du);
 				updateDUNumber = true;
+			} else {
+				du.updateDeploymentUnit(bundle);
+				Log.info("updated du " + du);
+				try {
+					Utils.updateDeploymentUnitNumberBranchAndRelatedLeafsDatamodel(
+							this.pmDataService, du);
+				} catch (Fault e) {
+					Log.error(e.getMessage(), e);
+					throw new RuntimeException(e.getMessage(), e);
+				}
 			}
-
 			break;
-		case BundleEvent.UNINSTALLED:
+		}
+		case BundleEvent.UNINSTALLED: {
 			// a bundle has been uninstalled
 			// find out the DeploymentUnit and report uninstallation
-			du = Manager.getSingletonInstance().getDeploymentUnit(
-					bundle.getBundleId());
+			DeploymentUnit du = manager.getDeploymentUnit(bundle.getBundleId());
+			Log.info("remove du " + du);
 			if (du != null) {
 				du.updateDeploymentUnitWhenTheBundleHasBeenUninstalled();
 				try {
 					Utils.updateDeploymentUnitNumberBranchAndRelatedLeafsDatamodel(
 							this.pmDataService, du);
-					Manager.getSingletonInstance().removeADeploymentUnit(du);
+					manager.removeADeploymentUnit(du);
 				} catch (Fault e) {
-					e.printStackTrace();
 					Log.error(e.getMessage(), e);
 					throw new RuntimeException(e.getMessage(), e);
 				}
 			}
 			updateDUNumber = true;
 			break;
+		}
 		default:
 			break;
 		}
 
 		if (updateDUNumber) {
-			Long deploymentUnitsNumberOfEntries = Long.valueOf(Integer
-					.toString(Manager.getSingletonInstance()
-							.getDeploymentUnits().size()));
-			Parameter deploymentUnitNumberOfEntriesLeaf;
+			Long nbDUs = new Long(manager.getDeploymentUnits().size());
 			try {
-				deploymentUnitNumberOfEntriesLeaf = this.pmDataService
+				Parameter deploymentUnitNumberOfEntriesLeaf = this.pmDataService
 						.createOrRetrieveParameter(this.pmDataService.getRoot()
 								+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES
 								+ SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT_NUMBER_OF_ENTRIES);
-				deploymentUnitNumberOfEntriesLeaf
-						.setValue(deploymentUnitsNumberOfEntries);
+				deploymentUnitNumberOfEntriesLeaf.setValue(nbDUs);
 			} catch (Fault e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.error(e.getMessage(), e);
 			}
-
 		}
 	}
 
 	private void updateDUs() throws NullPointerException, Fault {
+		Log.debug("DuAndEuEventListener.updateDUs");
 		// The value associated to Device.OSGI.BundleNumberOfEntries is
 		// bugged (once at least one bundle uninstallation has occured).
 		// Long bundleNumberOfEntries = (Long) this.pmDataService
@@ -219,67 +206,57 @@ public class DuAndEuEventListener implements BundleListener {
 
 		// Update the deployment units internal data, and the data model.
 		Bundle[] bundles = this.bundleContext.getBundles();
-		for (int i = 0; i < bundles.length; i = i + 1) {
-			Bundle b = bundles[i];
-			boolean bundleHasBeenFoundInManager = false;
-			Iterator duIterator = Manager.getSingletonInstance()
-					.getDeploymentUnits().iterator();
-			while (duIterator.hasNext()) {
-				DeploymentUnit du = (DeploymentUnit) duIterator.next();
-				if (b.getBundleId() == du.getUuid()) {
-					bundleHasBeenFoundInManager = true;
+		for (int i = 0; i < bundles.length; i++) {
+			Bundle bundle = bundles[i];
+			boolean bundleFoundInManager = false;
+			for (Iterator it = manager.getDeploymentUnits().iterator(); it.hasNext(); ) {
+				DeploymentUnit du = (DeploymentUnit) it.next();
+				if (bundle.getBundleId() == du.getUuid()) {
+					bundleFoundInManager = true;
 					// Update du's data.
-					du.updateDeploymentUnit(b);
+					du.updateDeploymentUnit(bundle);
 					try {
 						Utils.updateDeploymentUnitNumberBranchAndRelatedLeafsDatamodel(
 								this.pmDataService, du);
 					} catch (Fault e) {
-						e.printStackTrace();
 						Log.error(e.getMessage(), e);
 						throw new RuntimeException(e.getMessage(), e);
 					}
 					break;
 				}
 			}
-
-			if (!(bundleHasBeenFoundInManager)) {
-				DeploymentUnit du = new DeploymentUnit(b);
+			if (! bundleFoundInManager) {
+				DeploymentUnit du = new DeploymentUnit(bundle);
 				try {
 					Utils.createDeploymentUnitNumberBranchAndRelatedLeafsDatamodel(
 							this.pmDataService, du);
 				} catch (Fault e) {
-					e.printStackTrace();
 					Log.error(e.getMessage(), e);
 					throw new RuntimeException(e.getMessage(), e);
 				}
-				Manager.getSingletonInstance().getDeploymentUnits().add(du);
+				manager.addADeploymentUnit(du);
 			} // no "else" needed.
 		}
 
 		// Let's search, and find the uninstalled bundles.
-		Iterator duIterator = Manager.getSingletonInstance()
-				.getDeploymentUnits().iterator();
-		while (duIterator.hasNext()) {
-			DeploymentUnit du = (DeploymentUnit) duIterator.next();
-			boolean duHasBeenFoundInBundleContext = false;
-			for (int i = 0; i < bundles.length; i = i + 1) {
-				Bundle b = bundles[i];
-				if (du.getUuid() == b.getBundleId()) {
-					duHasBeenFoundInBundleContext = true;
+		for (Iterator it = manager.getDeploymentUnits().iterator(); it.hasNext(); ) {
+			DeploymentUnit du = (DeploymentUnit) it.next();
+			boolean duFoundInBundleContext = false;
+			for (int i = 0; i < bundles.length; i++) {
+				if (du.getUuid() == bundles[i].getBundleId()) {
+					duFoundInBundleContext = true;
 					break;
 				}
 			}
-
-			if (!(duHasBeenFoundInBundleContext)) {
+			if (! duFoundInBundleContext) {
 				// Here, it means that the bundle has been uninstalled.
 				// Let's update the du accordingly.
 				du.updateDeploymentUnitWhenTheBundleHasBeenUninstalled();
 				try {
 					Utils.updateDeploymentUnitNumberBranchAndRelatedLeafsDatamodel(
 							this.pmDataService, du);
-					Manager.getSingletonInstance().removeADeploymentUnit(du);
+					manager.removeADeploymentUnit(du);
 				} catch (Fault e) {
-					e.printStackTrace();
 					Log.error(e.getMessage(), e);
 					throw new RuntimeException(e.getMessage(), e);
 				}
@@ -288,61 +265,43 @@ public class DuAndEuEventListener implements BundleListener {
 
 		// As a consequence, the "number" of du in
 		// Manager.getSingletonInstance().getDeploymentUnits() is updated.
-		Long deploymentUnitsNumberOfEntries = Long.valueOf(Integer
-				.toString(Manager.getSingletonInstance().getDeploymentUnits()
-						.size()));
+		Long nbDUs = new Long(manager.getDeploymentUnits().size());
 		Parameter deploymentUnitNumberOfEntriesLeaf = this.pmDataService
 				.createOrRetrieveParameter(this.pmDataService.getRoot()
 						+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES
 						+ SM_Baseline1ProfileDataModel.DEPLOYMENT_UNIT_NUMBER_OF_ENTRIES);
-		deploymentUnitNumberOfEntriesLeaf
-				.setValue(deploymentUnitsNumberOfEntries);
+		deploymentUnitNumberOfEntriesLeaf.setValue(nbDUs);
 	}
 
-	private void updateEU(BundleEvent bundleEvent) {
-
+	private void updateEU(final BundleEvent bundleEvent) {
 		Bundle bundle = bundleEvent.getBundle();
-		ExecutionUnit eu = null;
 		boolean updateEUNumber = false;
 
 		switch (bundleEvent.getType()) {
-		case BundleEvent.INSTALLED:
+		case BundleEvent.INSTALLED: {
 			// create a new ExecutionUnit and add it into the datamodel
-			eu = new ExecutionUnit(bundle);
+			ExecutionUnit eu = new ExecutionUnit(bundle);
 			try {
 				Utils.createExecutionUnitNumberBranchAndRelatedLeafsDatamodel(
 						this.pmDataService, this.bundleContext, eu);
 			} catch (Fault e) {
-				e.printStackTrace();
 				Log.error(e.getMessage(), e);
 				throw new RuntimeException(e.getMessage(), e);
 			}
-			Manager.getSingletonInstance().getExecutionUnits().add(eu);
+			manager.addAnExecutionUnit(eu);
 			updateEUNumber = true;
 			break;
+		}
 		case BundleEvent.RESOLVED:
 		case BundleEvent.STARTED:
 		case BundleEvent.STARTING:
 		case BundleEvent.STOPPED:
 		case BundleEvent.STOPPING:
 		case BundleEvent.UNRESOLVED:
-		case BundleEvent.UPDATED:
+		case BundleEvent.UPDATED: {
 			// find out the ExecutionUnit and update it
-			eu = Manager.getSingletonInstance().getExecutionUnit(
-					bundle.getBundleId());
-			if (eu != null) {
-				// Update eu's data.
-				eu.updateExecutionUnit(bundle);
-				try {
-					Utils.updateExecutionUnitNumberBranchAndRelatedLeafsDatamodel(
-							this.pmDataService, eu);
-				} catch (Fault e) {
-					e.printStackTrace();
-					Log.error(e.getMessage(), e);
-					throw new RuntimeException(e.getMessage(), e);
-				}
-
-			} else {
+			ExecutionUnit eu = manager.getExecutionUnit(bundle.getBundleId());
+			if (eu == null) {
 				// should not occur
 				// try to create it to come back to a stable situation
 				eu = new ExecutionUnit(bundle);
@@ -350,122 +309,113 @@ public class DuAndEuEventListener implements BundleListener {
 					Utils.createExecutionUnitNumberBranchAndRelatedLeafsDatamodel(
 							this.pmDataService, this.bundleContext, eu);
 				} catch (Fault e) {
-					e.printStackTrace();
 					Log.error(e.getMessage(), e);
 					throw new RuntimeException(e.getMessage(), e);
 				}
-				Manager.getSingletonInstance().getExecutionUnits().add(eu);
+				manager.addAnExecutionUnit(eu);
 				updateEUNumber = true;
+			} else {
+				// Update eu's data.
+				eu.updateExecutionUnit(bundle);
+				try {
+					Utils.updateExecutionUnitNumberBranchAndRelatedLeafsDatamodel(
+							this.pmDataService, eu);
+				} catch (Fault e) {
+					Log.error(e.getMessage(), e);
+					throw new RuntimeException(e.getMessage(), e);
+				}
 			}
-
 			break;
-		case BundleEvent.UNINSTALLED:
-			eu = Manager.getSingletonInstance().getExecutionUnit(
-					bundle.getBundleId());
+		}
+		case BundleEvent.UNINSTALLED: {
+			ExecutionUnit eu = manager.getExecutionUnit(bundle.getBundleId());
 			if (eu != null) {
 				updateEUNumber = true;
 				eu.updateExecutionUnitWhenTheBundleHasBeenUninstalled();
 				try {
 					Utils.updateExecutionUnitNumberBranchAndRelatedLeafsDatamodel(
 							this.pmDataService, eu);
-					Manager.getSingletonInstance().removeAnExecutionUnit(eu);
+					manager.removeAnExecutionUnit(eu);
 				} catch (Fault e) {
-					e.printStackTrace();
 					Log.error(e.getMessage(), e);
 					throw new RuntimeException(e.getMessage(), e);
 				}
 			}
 			break;
+		}
 		default:
 			break;
 		}
 		
 		if (updateEUNumber) {
-			Long executionUnitsNumberOfEntries = Long.valueOf(Integer
-					.toString(Manager.getSingletonInstance().getExecutionUnits()
-							.size()));
-			Parameter executionUnitNumberOfEntriesLeaf;
+			Long nbEUs = new Long(manager.getExecutionUnits().size());
 			try {
-				executionUnitNumberOfEntriesLeaf = this.pmDataService
+				Parameter executionUnitNumberOfEntriesLeaf = this.pmDataService
 						.createOrRetrieveParameter(this.pmDataService.getRoot()
 								+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES
 								+ SM_Baseline1ProfileDataModel.EXECUTION_UNIT_NUMBER_OF_ENTRIES);
-				executionUnitNumberOfEntriesLeaf
-				.setValue(executionUnitsNumberOfEntries);
+				executionUnitNumberOfEntriesLeaf.setValue(nbEUs);
 			} catch (Fault e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+				Log.error(e.getMessage(), e);
+			}	
 		}
-
 	}
 
 	private void updateEUs() throws NullPointerException, Fault {
 		// Update the execution units internal data, and the datamodel.
 		Bundle[] bundles = this.bundleContext.getBundles();
-		for (int i = 0; i < bundles.length; i = i + 1) {
-			Bundle b = bundles[i];
-			boolean bundleHasBeenFoundInManager = false;
-			Iterator euIterator = Manager.getSingletonInstance()
-					.getExecutionUnits().iterator();
-			while (euIterator.hasNext()) {
-				ExecutionUnit eu = (ExecutionUnit) euIterator.next();
-				if (b.getBundleId() == eu.getEuid()) {
-					bundleHasBeenFoundInManager = true;
+		for (int i = 0; i < bundles.length; i++) {
+			Bundle bundle = bundles[i];
+			boolean bundleFoundInManager = false;
+			for (Iterator it = manager.getExecutionUnits().iterator(); it.hasNext(); ) {
+				ExecutionUnit eu = (ExecutionUnit) it.next();
+				if (bundle.getBundleId() == eu.getEuid()) {
+					bundleFoundInManager = true;
 					// Update eu's data.
-					eu.updateExecutionUnit(b);
+					eu.updateExecutionUnit(bundle);
 					try {
 						Utils.updateExecutionUnitNumberBranchAndRelatedLeafsDatamodel(
 								this.pmDataService, eu);
 					} catch (Fault e) {
-						e.printStackTrace();
 						Log.error(e.getMessage(), e);
 						throw new RuntimeException(e.getMessage(), e);
 					}
 					break;
 				}
 			}
-
-			if (!(bundleHasBeenFoundInManager)) {
-				ExecutionUnit eu = new ExecutionUnit(b);
+			if (! bundleFoundInManager) {
+				ExecutionUnit eu = new ExecutionUnit(bundle);
 				try {
 					Utils.createExecutionUnitNumberBranchAndRelatedLeafsDatamodel(
 							this.pmDataService, this.bundleContext, eu);
 				} catch (Fault e) {
-					e.printStackTrace();
 					Log.error(e.getMessage(), e);
 					throw new RuntimeException(e.getMessage(), e);
 				}
-				Manager.getSingletonInstance().getExecutionUnits().add(eu);
+				manager.addAnExecutionUnit(eu);
 			} // no "else" needed.
 		}
 
 		// Let's search, and find the uninstalled bundles (an active bundle can
 		// be uninstalled directly in OSGi).
-		Iterator euIterator = Manager.getSingletonInstance()
-				.getExecutionUnits().iterator();
-		while (euIterator.hasNext()) {
-			ExecutionUnit eu = (ExecutionUnit) euIterator.next();
-			boolean euHasBeenFoundInBundleContext = false;
-			for (int i = 0; i < bundles.length; i = i + 1) {
-				Bundle b = bundles[i];
-				if (eu.getEuid() == b.getBundleId()) {
-					euHasBeenFoundInBundleContext = true;
+		for (Iterator it = manager.getExecutionUnits().iterator(); it.hasNext(); ) {
+			ExecutionUnit eu = (ExecutionUnit) it.next();
+			boolean euFoundInBundleContext = false;
+			for (int i = 0; i < bundles.length; i++) {
+				if (eu.getEuid() == bundles[i].getBundleId()) {
+					euFoundInBundleContext = true;
 					break;
 				}
 			}
-
-			if (!(euHasBeenFoundInBundleContext)) {
+			if (! euFoundInBundleContext) {
 				// Here, it means that the bundle has been uninstalled.
 				// Let's update the eu accordingly.
 				eu.updateExecutionUnitWhenTheBundleHasBeenUninstalled();
 				try {
 					Utils.updateExecutionUnitNumberBranchAndRelatedLeafsDatamodel(
 							this.pmDataService, eu);
-					Manager.getSingletonInstance().removeAnExecutionUnit(eu);
+					manager.removeAnExecutionUnit(eu);
 				} catch (Fault e) {
-					e.printStackTrace();
 					Log.error(e.getMessage(), e);
 					throw new RuntimeException(e.getMessage(), e);
 				}
@@ -474,14 +424,12 @@ public class DuAndEuEventListener implements BundleListener {
 
 		// As a consequence, the "number" of eu in
 		// Manager.getSingletonInstance().getExecutionUnits() is updated.
-		Long executionUnitsNumberOfEntries = Long.valueOf(Integer
-				.toString(Manager.getSingletonInstance().getExecutionUnits()
-						.size()));
+		Long nbEUs = new Long(manager.getExecutionUnits().size());
 		Parameter executionUnitNumberOfEntriesLeaf = this.pmDataService
 				.createOrRetrieveParameter(this.pmDataService.getRoot()
 						+ SM_Baseline1ProfileDataModel.SOFTWAREMODULES
 						+ SM_Baseline1ProfileDataModel.EXECUTION_UNIT_NUMBER_OF_ENTRIES);
-		executionUnitNumberOfEntriesLeaf
-				.setValue(executionUnitsNumberOfEntries);
+		executionUnitNumberOfEntriesLeaf.setValue(nbEUs);
 	}
+	
 }

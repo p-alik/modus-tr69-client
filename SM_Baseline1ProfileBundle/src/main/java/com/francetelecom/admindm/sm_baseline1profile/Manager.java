@@ -73,16 +73,12 @@ public class Manager {
 
 	public void addADeploymentUnit(final DeploymentUnit du) {
 		synchronized (lock) {
-			boolean duAlreadyAppearInDeploymentUnits = false;
-			for (int i = 0; i < this.deploymentUnits.size(); i = i + 1) {
-				if (((DeploymentUnit) this.deploymentUnits.get(i)).getUuid() == du.getUuid()) {
-					duAlreadyAppearInDeploymentUnits = true;
-					break;
+			for (Iterator it = deploymentUnits.iterator(); it.hasNext(); ) {
+				if (((DeploymentUnit)it.next()).getUuid() == du.getUuid()) {
+					return;
 				}
 			}
-			if (!duAlreadyAppearInDeploymentUnits) {
-				this.deploymentUnits.add(du);
-			} // no "else" needed.
+			this.deploymentUnits.add(du);
 		}
 	}
 
@@ -97,12 +93,13 @@ public class Manager {
 	 * @param duid deployment unit id
 	 * @return a deployment unit or null
 	 */
-	public DeploymentUnit getDeploymentUnit(long duid) {
-		List deploymentUnits = getDeploymentUnits();
-		for(Iterator it = deploymentUnits.iterator(); it.hasNext();) {
-			DeploymentUnit du = (DeploymentUnit) it.next();
-			if (du.getDuid() == duid) {
-				return du;
+	public DeploymentUnit getDeploymentUnit(final long duid) {
+		synchronized (lock) {
+			for (Iterator it = deploymentUnits.iterator(); it.hasNext();) {
+				DeploymentUnit du = (DeploymentUnit) it.next();
+				if (du.getDuid() == duid) {
+					return du;
+				}
 			}
 		}
 		return null;
@@ -123,16 +120,12 @@ public class Manager {
 
 	public void addAnExecutionUnit(final ExecutionUnit eu) {
 		synchronized (lock2) {
-			boolean euAlreadyAppearInExecutionUnits = false;
-			for (int i = 0; i < this.executionUnits.size(); i = i + 1) {
-				if (((ExecutionUnit) this.executionUnits.get(i)).getEuid() == eu.getEuid()) {
-					euAlreadyAppearInExecutionUnits = true;
-					break;
+			for (Iterator it = executionUnits.iterator(); it.hasNext(); ) {
+				if (((ExecutionUnit)it.next()).getEuid() == eu.getEuid()) {
+					return;
 				}
 			}
-			if (!euAlreadyAppearInExecutionUnits) {
-				this.executionUnits.add(eu);
-			} // no "else" needed.
+			this.executionUnits.add(eu);
 		}
 	}
 
@@ -147,12 +140,13 @@ public class Manager {
 	 * @param euid execution unit id
 	 * @return the requested execution unit or null
 	 */
-	public ExecutionUnit getExecutionUnit(long euid) {
-		List executionUnits = getExecutionUnits();
-		for(Iterator it = executionUnits.iterator(); it.hasNext();) {
-			ExecutionUnit eu = (ExecutionUnit) it.next();
-			if (eu.getEuid() == euid) {
-				return eu;
+	public ExecutionUnit getExecutionUnit(final long euid) {
+		synchronized (lock2) {
+			for (Iterator it = executionUnits.iterator(); it.hasNext();) {
+				ExecutionUnit eu = (ExecutionUnit) it.next();
+				if (eu.getEuid() == euid) {
+					return eu;
+				}
 			}
 		}
 		return null;

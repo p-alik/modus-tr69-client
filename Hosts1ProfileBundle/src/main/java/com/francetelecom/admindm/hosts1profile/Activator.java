@@ -48,11 +48,8 @@ public final class Activator implements BundleActivator {
 	private IParameterData pmDataSvc;
 
 	public void start(final BundleContext bundleContext) throws Exception {
-
 		this.bundleContext = bundleContext;
-
 		ServiceReference parameterDataServiceRef = bundleContext.getServiceReference(IParameterData.class.getName());
-
 		if (parameterDataServiceRef != null) {
 			this.pmDataSvc = (IParameterData) bundleContext.getService(parameterDataServiceRef);
 			Log.info("Start " + HOSTS_1_PROFILE_BUNDLE + ", after IParameterData");
@@ -72,9 +69,6 @@ public final class Activator implements BundleActivator {
 			Log.error("Execution error: " + e.getMessage(), e);
 			throw new Hosts1ProfileException("Execution error: " + e.getMessage(), null);
 		}
-
-		
-		
 	}
 
 	public void stop(final BundleContext bundleContext) throws Exception {
@@ -82,4 +76,5 @@ public final class Activator implements BundleActivator {
 		bundleContext.removeServiceListener(this.devicesServiceListener);
 		this.pmDataSvc = null;
 	}
+
 }

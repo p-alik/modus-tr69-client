@@ -22,7 +22,11 @@
 
 package com.francetelecom.admindm.sm_baseline1profile;
 
+import java.util.Dictionary;
+
 import org.osgi.framework.Bundle;
+
+import com.francetelecom.admindm.sm_baseline1profile.utils.Utils;
 
 public class DeploymentUnit {
 
@@ -46,31 +50,32 @@ public class DeploymentUnit {
 	 * 
 	 * @param b
 	 */
-	public DeploymentUnit(final Bundle b) {
-		this.updateDeploymentUnit(b);
+	public DeploymentUnit(final Bundle bundle) {
+		this.updateDeploymentUnit(bundle);
 	}
 
 	/**
 	 * Update current DeploymentUnit thanks to the info coming from bundle b.
 	 * 
-	 * @param b
+	 * @param bundle
 	 */
-	public void updateDeploymentUnit(final Bundle b) {
-		this.uuid = b.getBundleId();
+	public void updateDeploymentUnit(final Bundle bundle) {
+		Dictionary headers = bundle.getHeaders();
+		this.uuid = bundle.getBundleId();
 		this.duid = this.uuid;
 		// this.name = b.getSymbolicName();
-		if (b.getHeaders().get("Bundle-Name") != null) {
-			this.name = (String) b.getHeaders().get("Bundle-Name");
+		if (headers.get(Utils.BUNDLE_NAME) != null) {
+			this.name = (String) headers.get(Utils.BUNDLE_NAME);
 		}
 
-		int status = b.getState();
+		int status = bundle.getState();
 		this.statusAsAString = checkStatusAndMoveItToAString(status);
 		this.resolved = isThisBundleResolved(status);
-		this.url = b.getLocation();
-		if (b.getHeaders().get("Bundle-Vendor") != null) {
-			this.vendor = (String) b.getHeaders().get("Bundle-Vendor");
+		this.url = bundle.getLocation();
+		if (headers.get(Utils.BUNDLE_VENDOR) != null) {
+			this.vendor = (String) headers.get(Utils.BUNDLE_VENDOR);
 		}
-		this.version = (String) b.getHeaders().get("Bundle-Version");
+		this.version = (String) headers.get(Utils.BUNDLE_VERSION);
 		// In OSGi, a bundle is both a deployment unit, and an execution unit,
 		// so uuid == duid == euid.
 		this.executionUnitList = Long.toString(this.uuid);
@@ -109,23 +114,17 @@ public class DeploymentUnit {
 	 *         Uninstalled).
 	 */
 	private String checkStatusAndMoveItToAString(final int bundleStatus) {
-		String result;
-		if (bundleStatus == Bundle.UNINSTALLED) {
-			result = "Uninstalled";
-		} else if (bundleStatus == Bundle.INSTALLED) {
-			result = "Installed";
-		} else if (bundleStatus == Bundle.RESOLVED) {
-			result = "Installed";
-		} else if (bundleStatus == Bundle.STARTING) {
-			result = "Installed";
-		} else if (bundleStatus == Bundle.STOPPING) {
-			result = "Installed";
-		} else if (bundleStatus == Bundle.ACTIVE) {
-			result = "Installed";
-		} else {
-			throw new RuntimeException("This bundle state (" + bundleStatus + ") is UNKNOWN.");
+		switch(bundleStatus) {
+		case Bundle.UNINSTALLED:
+			return Utils.UNINSTALLED;
+		case Bundle.INSTALLED:
+		case Bundle.RESOLVED:
+		case Bundle.STARTING:
+		case Bundle.STOPPING:
+		case Bundle.ACTIVE:
+			return Utils.INSTALLED;
 		}
-		return result;
+		throw new RuntimeException("This bundle state (" + bundleStatus + ") is UNKNOWN.");
 	}
 
 	public String getStatusAsAString() {
@@ -157,23 +156,17 @@ public class DeploymentUnit {
 	}
 
 	private Boolean isThisBundleResolved(final int bundleStatus) {
-		Boolean result;
-		if (bundleStatus == Bundle.UNINSTALLED) {
-			result = Boolean.FALSE;
-		} else if (bundleStatus == Bundle.INSTALLED) {
-			result = Boolean.FALSE;
-		} else if (bundleStatus == Bundle.RESOLVED) {
-			result = Boolean.TRUE;
-		} else if (bundleStatus == Bundle.STARTING) {
-			result = Boolean.TRUE;
-		} else if (bundleStatus == Bundle.STOPPING) {
-			result = Boolean.TRUE;
-		} else if (bundleStatus == Bundle.ACTIVE) {
-			result = Boolean.TRUE;
-		} else {
-			throw new RuntimeException("This deployment unit state (" + bundleStatus + ") is UNKNOWN.");
+		switch(bundleStatus) {
+		case Bundle.UNINSTALLED:
+		case Bundle.INSTALLED:
+			return Boolean.FALSE;
+		case Bundle.RESOLVED:
+		case Bundle.STARTING:
+		case Bundle.STOPPING:
+		case Bundle.ACTIVE:
+			return Boolean.TRUE;
 		}
-		return result;
+		throw new RuntimeException("This deployment unit state (" + bundleStatus + ") is UNKNOWN.");
 	}
 
 	/**

@@ -22,7 +22,11 @@
 
 package com.francetelecom.admindm.sm_baseline1profile;
 
+import java.util.Dictionary;
+
 import org.osgi.framework.Bundle;
+
+import com.francetelecom.admindm.sm_baseline1profile.utils.Utils;
 
 public class ExecutionUnit {
 
@@ -58,16 +62,17 @@ public class ExecutionUnit {
 	/**
 	 * Update current ExecutionUnit thanks to the info coming from bundle b.
 	 * 
-	 * @param b
+	 * @param bundle
 	 */
-	public void updateExecutionUnit(final Bundle b) {
-		this.euid = b.getBundleId();
+	public void updateExecutionUnit(final Bundle bundle) {
+		Dictionary headers = bundle.getHeaders();
+		this.euid = bundle.getBundleId();
 		// this.name = b.getSymbolicName();
-		if (b.getHeaders().get("Bundle-Name") != null) {
-			this.name = (String) b.getHeaders().get("Bundle-Name");
+		if (headers.get(Utils.BUNDLE_NAME) != null) {
+			this.name = (String) headers.get(Utils.BUNDLE_NAME);
 		}
-		this.execEnvLabel = String.valueOf(b.getBundleId());
-		int status = b.getState();
+		this.execEnvLabel = String.valueOf(bundle.getBundleId());
+		int status = bundle.getState();
 		this.statusAsAString = checkStatusAndMoveItToAString(status);
 
 		// There is no requestedState, here, at initialization time.
@@ -77,10 +82,10 @@ public class ExecutionUnit {
 		// NoFault implies empty String executionFaultMessage.
 		this.executionFaultMessage = "";
 
-		if (b.getHeaders().get("Bundle-Vendor") != null) {
-			this.vendor = (String) b.getHeaders().get("Bundle-Vendor");
+		if (headers.get(Utils.BUNDLE_VENDOR) != null) {
+			this.vendor = (String) headers.get(Utils.BUNDLE_VENDOR);
 		}
-		this.version = (String) b.getHeaders().get("Bundle-Version");
+		this.version = (String) headers.get(Utils.BUNDLE_VERSION);
 	}
 
 	/**
@@ -114,23 +119,20 @@ public class ExecutionUnit {
 	 * @return the execution unit status as a String (i.e. Idle, Starting, Active, or Stopping).
 	 */
 	private String checkStatusAndMoveItToAString(final int bundleStatus) {
-		String result;
-		if (bundleStatus == Bundle.UNINSTALLED) {
-			result = "Uninstalled";
-		} else if (bundleStatus == Bundle.INSTALLED) {
-			result = "Idle";
-		} else if (bundleStatus == Bundle.RESOLVED) {
-			result = "Idle";
-		} else if (bundleStatus == Bundle.STARTING) {
-			result = "Starting";
-		} else if (bundleStatus == Bundle.STOPPING) {
-			result = "Stopping";
-		} else if (bundleStatus == Bundle.ACTIVE) {
-			result = "Active";
-		} else {
-			throw new RuntimeException("This bundle state (" + bundleStatus + ") is UNKNOWN.");
+		switch(bundleStatus) {
+		case Bundle.UNINSTALLED:
+			return Utils.UNINSTALLED;
+		case Bundle.INSTALLED:
+		case Bundle.RESOLVED:
+			return Utils.IDLE;
+		case Bundle.STARTING:
+			return Utils.STARTING;
+		case Bundle.STOPPING:
+			return Utils.STOPPING;
+		case Bundle.ACTIVE:
+			return Utils.ACTIVE;
 		}
-		return result;
+		throw new RuntimeException("This bundle state (" + bundleStatus + ") is UNKNOWN.");
 	}
 
 	public String getStatusAsAString() {

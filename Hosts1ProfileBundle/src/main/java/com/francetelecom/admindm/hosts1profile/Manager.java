@@ -63,7 +63,6 @@ public class Manager {
 	 */
 	public List getDevices() {
 		synchronized (lock) {
-			Log.debug("hosts1profile.Manager.getDevices()");
 			List copy = new ArrayList();
 			for (int i = 0; i < this.devices.size(); i = i + 1) {
 				copy.add(this.devices.get(i));
@@ -96,8 +95,7 @@ public class Manager {
 	}
 	
 	public DeviceFromBaseDriver getADevice(String servicePid) {
-		List devices = getDevices();
-		for(Iterator it = devices.iterator(); it.hasNext();) {
+		for(Iterator it = getDevices().iterator(); it.hasNext();) {
 			DeviceFromBaseDriver d = (DeviceFromBaseDriver) it.next();
 			if (d.getServicePid().equals(servicePid)) {
 				return d;

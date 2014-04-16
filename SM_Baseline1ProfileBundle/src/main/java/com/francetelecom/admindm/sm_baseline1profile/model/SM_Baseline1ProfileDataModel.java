@@ -470,8 +470,8 @@ public class SM_Baseline1ProfileDataModel {
 	 * @param pmDataService
 	 * @throws Fault
 	 */
-	public SM_Baseline1ProfileDataModel(final BundleContext bundleContext, final IParameterData pmDataService)
-			throws Fault {
+	public SM_Baseline1ProfileDataModel(final BundleContext bundleContext, 
+			final IParameterData pmDataService) throws Fault {
 		super();
 		this.bundleContext = bundleContext;
 
@@ -486,15 +486,16 @@ public class SM_Baseline1ProfileDataModel {
 	 * This method inits this SM_Baseline:1 Profile implementation internal data.
 	 */
 	private void initImplementationInternalData() {
+		Manager manager = Manager.getSingletonInstance();
 		Bundle[] bundles = this.bundleContext.getBundles();
 		for (int i = 0; i < bundles.length; i = i + 1) {
-			Bundle b = bundles[i];
+			Bundle bundle = bundles[i];
 			// Initialize the internal data for the deployment units.
-			DeploymentUnit du = new DeploymentUnit(b);
-			Manager.getSingletonInstance().addADeploymentUnit(du);
+			DeploymentUnit du = new DeploymentUnit(bundle);
+			manager.addADeploymentUnit(du);
 			// Initialize the internal data for the execution units.
-			ExecutionUnit eu = new ExecutionUnit(b);
-			Manager.getSingletonInstance().addAnExecutionUnit(eu);
+			ExecutionUnit eu = new ExecutionUnit(bundle);
+			manager.addAnExecutionUnit(eu);
 		}
 	}
 
@@ -503,12 +504,15 @@ public class SM_Baseline1ProfileDataModel {
 	 * @throws Fault
 	 */
 	private void createDatamodel(final IParameterData pmDataService) throws Fault {
-		Parameter softwaremodulesBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SOFTWAREMODULES);
+		final String root = pmDataService.getRoot();
+		final String _SOFTWAREMODULES = root + SOFTWAREMODULES;
+		final String _EXECENV = root + SOFTWAREMODULES + EXECENV;
+		final String _EXECENV_NB_ZERO = _EXECENV + EXECENV_NUMBER_ZERO;
+		Parameter softwaremodulesBranch = pmDataService.createOrRetrieveParameter(_SOFTWAREMODULES);
 		softwaremodulesBranch.setType(ParameterType.ANY);
 
-		Parameter execEnvNumberOfEntriesLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SOFTWAREMODULES + EXEC_ENV_NUMBER_OF_ENTRIES);
+		Parameter execEnvNumberOfEntriesLeaf = pmDataService.createOrRetrieveParameter(
+				_SOFTWAREMODULES + EXEC_ENV_NUMBER_OF_ENTRIES);
 		execEnvNumberOfEntriesLeaf.setType(ParameterType.UINT);
 		execEnvNumberOfEntriesLeaf.setStorageMode(StorageMode.COMPUTED);
 		execEnvNumberOfEntriesLeaf.setWritable(false);
@@ -516,8 +520,8 @@ public class SM_Baseline1ProfileDataModel {
 		execEnvNumberOfEntriesLeaf.setActiveNotificationDenied(false);
 		execEnvNumberOfEntriesLeaf.setValue(EXEC_ENV_NUMBER_OF_ENTRIES_VALUE);
 
-		Parameter deploymentUnitNumberOfEntriesLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SOFTWAREMODULES + DEPLOYMENT_UNIT_NUMBER_OF_ENTRIES);
+		Parameter deploymentUnitNumberOfEntriesLeaf = pmDataService.createOrRetrieveParameter(
+				_SOFTWAREMODULES + DEPLOYMENT_UNIT_NUMBER_OF_ENTRIES);
 		deploymentUnitNumberOfEntriesLeaf.setType(ParameterType.UINT);
 		deploymentUnitNumberOfEntriesLeaf.setStorageMode(StorageMode.COMPUTED);
 		deploymentUnitNumberOfEntriesLeaf.setWritable(false);
@@ -525,8 +529,8 @@ public class SM_Baseline1ProfileDataModel {
 		deploymentUnitNumberOfEntriesLeaf.setActiveNotificationDenied(false);
 		deploymentUnitNumberOfEntriesLeaf.setValue(new Long(0));
 
-		Parameter executionUnitNumberOfEntriesLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SOFTWAREMODULES + EXECUTION_UNIT_NUMBER_OF_ENTRIES);
+		Parameter executionUnitNumberOfEntriesLeaf = pmDataService.createOrRetrieveParameter(
+				_SOFTWAREMODULES + EXECUTION_UNIT_NUMBER_OF_ENTRIES);
 		executionUnitNumberOfEntriesLeaf.setType(ParameterType.UINT);
 		executionUnitNumberOfEntriesLeaf.setStorageMode(StorageMode.COMPUTED);
 		executionUnitNumberOfEntriesLeaf.setWritable(false);
@@ -534,17 +538,14 @@ public class SM_Baseline1ProfileDataModel {
 		executionUnitNumberOfEntriesLeaf.setActiveNotificationDenied(false);
 		executionUnitNumberOfEntriesLeaf.setValue(new Long(0));
 
-		Parameter execEnvBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + SOFTWAREMODULES
-				+ EXECENV);
+		Parameter execEnvBranch = pmDataService.createOrRetrieveParameter(_EXECENV);
 		execEnvBranch.setType(ParameterType.ANY);
 
-		Parameter execEnvNumberZeroBranch = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SOFTWAREMODULES + EXECENV + EXECENV_NUMBER_ZERO);
+		Parameter execEnvNumberZeroBranch = pmDataService.createOrRetrieveParameter(_EXECENV_NB_ZERO);
 		execEnvNumberZeroBranch.setType(ParameterType.ANY);
 
 		// XXX AAA: Enable should be WRITABLE.
-		Parameter enableLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + SOFTWAREMODULES
-				+ EXECENV + EXECENV_NUMBER_ZERO + ENABLE);
+		Parameter enableLeaf = pmDataService.createOrRetrieveParameter(_EXECENV_NB_ZERO + ENABLE);
 		enableLeaf.setType(ParameterType.BOOLEAN);
 		enableLeaf.setStorageMode(StorageMode.COMPUTED);
 		enableLeaf.setWritable(false);
@@ -552,8 +553,7 @@ public class SM_Baseline1ProfileDataModel {
 		enableLeaf.setActiveNotificationDenied(false);
 		enableLeaf.setValue(Boolean.TRUE);
 
-		Parameter statusLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + SOFTWAREMODULES
-				+ EXECENV + EXECENV_NUMBER_ZERO + STATUS);
+		Parameter statusLeaf = pmDataService.createOrRetrieveParameter(_EXECENV_NB_ZERO + STATUS);
 		statusLeaf.setType(ParameterType.STRING);
 		statusLeaf.setStorageMode(StorageMode.COMPUTED);
 		statusLeaf.setWritable(false);
@@ -562,8 +562,7 @@ public class SM_Baseline1ProfileDataModel {
 		statusLeaf.addCheck(new CheckLength(45));
 		statusLeaf.setValue("Up");
 
-		Parameter nameLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + SOFTWAREMODULES
-				+ EXECENV + EXECENV_NUMBER_ZERO + NAME);
+		Parameter nameLeaf = pmDataService.createOrRetrieveParameter(_EXECENV_NB_ZERO + NAME);
 		nameLeaf.setType(ParameterType.STRING);
 		nameLeaf.setStorageMode(StorageMode.COMPUTED);
 		nameLeaf.setWritable(false);
@@ -572,8 +571,7 @@ public class SM_Baseline1ProfileDataModel {
 		nameLeaf.addCheck(new CheckLength(32));
 		nameLeaf.setValue("ExecEnvName:OSGi");
 
-		Parameter typeLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + SOFTWAREMODULES
-				+ EXECENV + EXECENV_NUMBER_ZERO + TYPE);
+		Parameter typeLeaf = pmDataService.createOrRetrieveParameter(_EXECENV_NB_ZERO + TYPE);
 		typeLeaf.setType(ParameterType.STRING);
 		typeLeaf.setStorageMode(StorageMode.COMPUTED);
 		typeLeaf.setWritable(false);
@@ -582,8 +580,7 @@ public class SM_Baseline1ProfileDataModel {
 		typeLeaf.addCheck(new CheckLength(64));
 		typeLeaf.setValue("OSGiR4.3");
 
-		Parameter vendorLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + SOFTWAREMODULES
-				+ EXECENV + EXECENV_NUMBER_ZERO + VENDOR);
+		Parameter vendorLeaf = pmDataService.createOrRetrieveParameter(_EXECENV_NB_ZERO + VENDOR);
 		vendorLeaf.setType(ParameterType.STRING);
 		vendorLeaf.setStorageMode(StorageMode.COMPUTED);
 		vendorLeaf.setWritable(false);
@@ -592,8 +589,7 @@ public class SM_Baseline1ProfileDataModel {
 		vendorLeaf.addCheck(new CheckLength(128));
 		vendorLeaf.setValue("ApacheFelix");
 
-		Parameter versionLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot() + SOFTWAREMODULES
-				+ EXECENV + EXECENV_NUMBER_ZERO + VERSION);
+		Parameter versionLeaf = pmDataService.createOrRetrieveParameter(_EXECENV_NB_ZERO + VERSION);
 		versionLeaf.setType(ParameterType.STRING);
 		versionLeaf.setStorageMode(StorageMode.COMPUTED);
 		versionLeaf.setWritable(false);
@@ -602,8 +598,8 @@ public class SM_Baseline1ProfileDataModel {
 		versionLeaf.addCheck(new CheckLength(32));
 		versionLeaf.setValue("4.0.3");
 
-		Parameter activeExecutionUnitsLeaf = pmDataService.createOrRetrieveParameter(pmDataService.getRoot()
-				+ SOFTWAREMODULES + EXECENV + EXECENV_NUMBER_ZERO + ACTIVE_EXECUTION_UNITS);
+		Parameter activeExecutionUnitsLeaf = pmDataService.createOrRetrieveParameter(_EXECENV_NB_ZERO 
+				+ ACTIVE_EXECUTION_UNITS);
 		activeExecutionUnitsLeaf.setType(ParameterType.STRING);
 		activeExecutionUnitsLeaf.setStorageMode(StorageMode.COMPUTED);
 		activeExecutionUnitsLeaf.setWritable(false);
