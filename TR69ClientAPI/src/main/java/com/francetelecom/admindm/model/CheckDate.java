@@ -21,8 +21,6 @@
 
 package com.francetelecom.admindm.model;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.regexp.RE;
 
