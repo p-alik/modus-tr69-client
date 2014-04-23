@@ -49,7 +49,7 @@ public class RequestURIParser {
 	/**
 	 * QUESTION MARK REGULAR EXPRESSION
 	 */
-	private static final RE QUESTION_MARK_RE = new RE("?");
+	private static final RE QUESTION_MARK_RE = new RE("\\?");
 	
 	/**
 	 * & REGULAR EXPRESSION
