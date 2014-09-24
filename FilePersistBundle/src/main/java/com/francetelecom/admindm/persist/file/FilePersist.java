@@ -97,14 +97,14 @@ public final class FilePersist implements IPersist {
 				throw new RuntimeException(error.toString());
 			}
 			if (dataSaveFile.exists()) {
+				Log.debug("A dataSaveFile: " + dataSaveFile.getAbsolutePath()
+						+ " exists. Let's try to read, and restore the data it contains.");
 				FileInputStream istream = null;
 				try {
 					istream = new FileInputStream(dataSaveFile);
 					ObjectInputStream p = new ObjectInputStream(istream);
 					mapKey = (HashMap) p.readObject();
-
-					System.out.println("AC1982: 24 sept. 2014 14:28:27: mapkey: " + mapKey);
-
+					Log.debug("Restored data mapKey: " + mapKey);
 				} catch (IOException e) {
 					e.printStackTrace();
 				} finally {
