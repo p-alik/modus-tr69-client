@@ -36,6 +36,11 @@ public class FileUtil {
 	public static final String LOG = "2 Vendor Log File";
 	public static final String DATAMODEL = "X ORANGE DataModel File";
 	public static final String USINE = "X ORANGE Usine File";
+	/**
+	 * see file: defineFile.cfg or CSV.cfg
+	 * 
+	 * Usually, they contain a property: X ORANGE Data Save File=./data/data.sav
+	 */
 	public static final String SAVE = "X ORANGE Data Save File";
 	public static final String IPCONF = "X ORANGE IP File";
 
@@ -87,8 +92,7 @@ public class FileUtil {
 	}
 
 	/**
-	 * Parse a string to extract the properties and there value (the string is
-	 * ignored if it starts with a # symbol).
+	 * Parse a string to extract the properties and there value (the string is ignored if it starts with a # symbol).
 	 * 
 	 * @param chaine
 	 *            the chaine

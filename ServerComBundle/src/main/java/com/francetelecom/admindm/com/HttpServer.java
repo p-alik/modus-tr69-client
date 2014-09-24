@@ -43,8 +43,7 @@ public final class HttpServer implements Runnable {
 	/** The random port. */
 	private static int randomPort = DEFAULT_PORT;
 	/**
-	 * The random path. note: <i>Can not use Math.random() with Mika JVM</i>
-	 * should be :<br/>
+	 * The random path. note: <i>Can not use Math.random() with Mika JVM</i> should be :<br/>
 	 */
 	private static String randomPath = "/" + System.currentTimeMillis();
 
@@ -107,7 +106,6 @@ public final class HttpServer implements Runnable {
 	 * @return the uRL
 	 */
 	public static String getURL() {
-
 		StringBuffer result = new StringBuffer("http://");
 		String adress = "";
 		if (HttpServer.address != null) {

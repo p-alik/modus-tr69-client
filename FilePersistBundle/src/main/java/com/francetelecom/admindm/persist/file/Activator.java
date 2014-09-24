@@ -23,7 +23,6 @@ package com.francetelecom.admindm.persist.file;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
 
 import com.francetelecom.admindm.persist.IPersist;
 
@@ -41,11 +40,7 @@ public final class Activator implements BundleActivator {
 	 */
 	public void start(final BundleContext context) throws Exception {
 		FilePersist persist = new FilePersist();
-		if (persist.getDataFile() != null) {
-			context.registerService(IPersist.class.getName(), persist, null);
-		} else {
-			throw new BundleException("Persist File not defined, see log.");
-		}
+		context.registerService(IPersist.class.getName(), persist, null);
 	}
 
 	/**

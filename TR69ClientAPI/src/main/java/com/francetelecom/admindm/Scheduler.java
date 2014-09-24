@@ -158,7 +158,7 @@ public final class Scheduler implements ServiceListener {
 	}
 
 	/**
-	 * Start t r69.
+	 * Start TR69.
 	 */
 	private void startTR69() {
 		if (checkState()) {
@@ -283,13 +283,13 @@ public final class Scheduler implements ServiceListener {
 	 * @see com.francetelecom.admindm.api.ICSV#putDefaultParameter()
 	 */
 	public void putDefaultParameter() {
-		File dataSave = FileUtil.getFileFromShortName(FileUtil.SAVE);
-		if (dataSave == null) {
+		File dataSaveFile = FileUtil.getFileFromShortName(FileUtil.SAVE);
+		if (dataSaveFile == null) {
 			StringBuffer error = new StringBuffer(FileUtil.SAVE);
 			error.append(" is not defined : no persistance will be present.");
 			Log.error(error.toString());
 		}
-		if (dataSave == null || !dataSave.exists()) {
+		if (dataSaveFile == null || !dataSaveFile.exists()) {
 			this.data.addEvent(new EventStruct(EventCode.BOOTSTRAP, ""));
 		}
 		this.data.addEvent(new EventStruct(EventCode.BOOT, ""));

@@ -55,4 +55,10 @@ public class PersistElement implements Serializable {
 		this.notification = notification;
 		this.value = value;
 	}
+
+	public String toString() {
+		String result = "" + PersistElement.class.getName() + "[key: " + key + ", subscribers: " + subscribers
+				+ ", notification: " + notification + ", value: " + value + "]";
+		return result;
+	}
 }

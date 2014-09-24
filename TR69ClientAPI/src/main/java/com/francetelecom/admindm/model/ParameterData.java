@@ -112,8 +112,7 @@ public final class ParameterData extends Observable implements IParameterData, O
 	private static String parameterKey;
 
 	/**
-	 * Instantiates a new parameter data (with "InternetGatewayDevice." as root
-	 * of the data model).
+	 * Instantiates a new parameter data (with "InternetGatewayDevice." as root of the data model).
 	 */
 	public ParameterData() {
 		this.deviceId = new DeviceIdStruct(this);
@@ -177,8 +176,7 @@ public final class ParameterData extends Observable implements IParameterData, O
 			}
 		}
 		/*
-		 * if (result == null) { Log.warn("try to get unknown Parameter \"" +
-		 * value+"\""); }
+		 * if (result == null) { Log.warn("try to get unknown Parameter \"" + value+"\""); }
 		 */
 		return result;
 	}

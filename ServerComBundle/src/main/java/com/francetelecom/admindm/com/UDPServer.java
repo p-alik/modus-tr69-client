@@ -33,10 +33,9 @@ import com.francetelecom.admindm.api.Log;
 import com.francetelecom.admindm.model.IParameterData;
 import com.francetelecom.admindm.stunclient.ISTUNCLient;
 
-	/**
+/**
  * <p>
- * This class provides a UDP server used to receive the UDP Connection Request
- * sent by the ACS.
+ * This class provides a UDP server used to receive the UDP Connection Request sent by the ACS.
  * </p>
  * <p>
  * The UDP server is bound on the port 7547 by default.
@@ -100,7 +99,7 @@ public final class UDPServer implements Runnable {
 		}
 		return udpServer;
 	}
-	
+
 	/**
 	 * Sets the best ni.
 	 * 
@@ -183,8 +182,8 @@ public final class UDPServer implements Runnable {
 	}
 
 	/**
-	 * Set the port number on which the UDP server is bound. This method has to
-	 * be invoked prior to start the UDP server thread.
+	 * Set the port number on which the UDP server is bound. This method has to be invoked prior to start the UDP server
+	 * thread.
 	 * 
 	 * @param port
 	 *            port
@@ -229,8 +228,7 @@ public final class UDPServer implements Runnable {
 	}
 
 	/**
-	 * Set the STUN client to use. It also invokes the start method provided by
-	 * the STUN client.
+	 * Set the STUN client to use. It also invokes the start method provided by the STUN client.
 	 * 
 	 * @param pStunClient
 	 *            stun client, null to unset
@@ -309,14 +307,13 @@ public final class UDPServer implements Runnable {
 
 	/**
 	 * <p>
-	 * Return the InetAddress object corresponding to the first network
-	 * interface different of the loopback interface.
+	 * Return the InetAddress object corresponding to the first network interface different of the loopback interface.
 	 * </p>
 	 * 
 	 * @return an InetAddress or null
 	 */
 	public static InetAddress getExternalInetAddress() {
-			try {
+		try {
 			if (UDPServer.address != null) {
 				try {
 					return InetAddress.getByName(UDPServer.address);

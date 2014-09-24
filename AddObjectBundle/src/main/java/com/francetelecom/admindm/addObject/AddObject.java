@@ -112,7 +112,7 @@ public final class AddObject implements RPCMethod {
 			StringBuffer error = new StringBuffer(FaultUtil.STR_FAULT_9005);
 			error.append(": ");
 			error.append(objectName);
-			error.append(" does'nt belong to the implemented data model.");
+			error.append(" doesn't belong to the implemented data model.");
 			throw new Fault(FaultUtil.FAULT_9005, error.toString());
 		}
 		Factory factory = param.getFactory();

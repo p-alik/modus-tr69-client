@@ -56,85 +56,79 @@ public final class FilePersist implements IPersist {
 	public static final int UNDEFINED = 7;
 	/** The Constant BASE64. */
 	public static final int BASE64 = 8;
-	/** The data file. */
-	private File dataFile;
+	/** The data save file. */
+	private File dataSaveFile;
 
-	/**
-	 * Gets the data file.
-	 * 
-	 * @return the data file
-	 */
-	public File getDataFile() {
-		return dataFile;
-	}
+	/** The map key. */
+	private Map mapKey = new HashMap();
+	/** The last line. */
+	int lastLine = 0;
 
 	/**
 	 * The Constructor use a file indirection.
 	 * 
 	 * @param filename
 	 *            the filename
+	 * 
+	 * @throws Exception
+	 *             , if any pb occurs.
 	 */
-	public FilePersist() {
-		dataFile = FileUtil.getFileFromShortName(FileUtil.SAVE);
-		if (dataFile == null) {
-			StringBuffer error = new StringBuffer("\"");
-			error.append(FileUtil.SAVE);
-			error.append("=\" is not defined into ");
-			error.append(FileUtil.CONFIG_FILE);
-			Log.error(error.toString());
-		}
-		try {
-			initializeData();
-		} catch (Exception e) {
-			Log.error("ShouldNotOccured", e);
-		}
+	public FilePersist() throws Exception {
+		dataSaveFile = FileUtil.getFileFromShortName(FileUtil.SAVE);
+		initializeData();
 	}
 
 	/**
 	 * Initialize data.
 	 * 
+	 * Note that this method is "public" just because the tests require it.
+	 * 
 	 * @throws Exception
-	 *             the exception
+	 *             , if any pb occurs.
 	 */
 	public void initializeData() throws Exception {
-		if (dataFile == null) {
-			StringBuffer error = new StringBuffer("\"");
-			error.append(FileUtil.SAVE);
-			error.append("=\" is not defined into ");
-			error.append(FileUtil.CONFIG_FILE);
-			throw new RuntimeException(error.toString());
-		}
-		if (!dataFile.exists()) {
-			String path = dataFile.getAbsolutePath();
-			int pos = path.lastIndexOf(File.separator);
-			if (pos >= 0) {
-				File dir = new File(path.substring(0, pos));
-				dir.mkdirs();
-			}
-			dataFile.createNewFile();
-		}
-		FileInputStream istream = null;
 		try {
-			istream = new FileInputStream(dataFile);
-			ObjectInputStream p = new ObjectInputStream(istream);
-			mapKey = (HashMap) p.readObject();
-			istream.close();
-		} catch (IOException e) {
-		} finally {
-			try {
-				if (istream != null) {
-					istream.close();
-				}
-			} catch (IOException e) {
-				Log.error("ShouldNotOccured", e);
+			if (dataSaveFile == null) {
+				StringBuffer error = new StringBuffer("\"");
+				error.append(FileUtil.SAVE);
+				error.append("=\" is not defined into ");
+				error.append(FileUtil.CONFIG_FILE);
+				Log.error(error.toString());
+				throw new RuntimeException(error.toString());
 			}
+			if (dataSaveFile.exists()) {
+				FileInputStream istream = null;
+				try {
+					istream = new FileInputStream(dataSaveFile);
+					ObjectInputStream p = new ObjectInputStream(istream);
+					mapKey = (HashMap) p.readObject();
+
+					System.out.println("AC1982: 24 sept. 2014 14:28:27: mapkey: " + mapKey);
+
+				} catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+					try {
+						if (istream != null) {
+							istream.close();
+						}
+					} catch (IOException e) {
+						Log.error("ShouldNotOccured", e);
+					}
+				}
+			} else {
+				String path = dataSaveFile.getAbsolutePath();
+				int pos = path.lastIndexOf(File.separator);
+				if (pos >= 0) {
+					File dir = new File(path.substring(0, pos));
+					dir.mkdirs();
+				}
+				dataSaveFile.createNewFile();
+			}
+		} catch (Exception e) {
+			throw new Exception("Persist File not defined, see log.", e);
 		}
 	}
-
-	/** The map key. */
-	private Map mapKey = new HashMap();
-	/** The last line. */
-	int lastLine = 0;
 
 	/**
 	 * Persist parameter attribute.
@@ -149,16 +143,29 @@ public final class FilePersist implements IPersist {
 	 *            the value
 	 * @param type
 	 *            the type
-	 * @see com.francetelecom.admindm.persist.IPersist#persistParameterAttribute(java.lang.String,
-	 *      java.lang.String[], int)
+	 * @see com.francetelecom.admindm.persist.IPersist#persistParameterAttribute(java.lang.String, java.lang.String[],
+	 *      int)
 	 */
 	public void persist(final String key, final String[] subscribers, final int notification, final Object value,
 			final int type) {
+
+		System.out.println("AC1982: 24 sept. 2014 11:05:34: FilePersist.persist(key: " + key + ", subscribers: "
+				+ subscribers + ", notification: " + notification + ", value: " + value + ", type: " + type);
+
 		mapKey.put(key, new PersistElement(key, subscribers, notification, value));
 		try {
-			dataFile.createNewFile();
-			FileOutputStream ostream = new FileOutputStream(dataFile);
+			// Log.debug("dataSaveFile.createNewFile(): " + dataSaveFile.createNewFile());
+			// dataSaveFile.createNewFile(); - there is no need to execute this line; the file has been initialized in
+			// FilePersist constructor.
+			FileOutputStream ostream = new FileOutputStream(dataSaveFile);
 			ObjectOutputStream p = new ObjectOutputStream(ostream);
+			// System.out.println("AC1982: 24 sept. 2014 11:34:45: mapKey: " + mapKey);
+			// Iterator ki = mapKey.keySet().iterator();
+			// while (ki.hasNext()) {
+			// Object k = ki.next();
+			// System.out.println("AC1982: 24 sept. 2014 11:36:01: write: k: " + k + ", mapKey.get(k): "
+			// + mapKey.get(k));
+			// }
 			p.writeObject(mapKey);
 			ostream.close();
 		} catch (IOException e) {
