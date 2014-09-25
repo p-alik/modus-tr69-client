@@ -209,7 +209,9 @@ public final class Scheduler implements ServiceListener {
 			while (it.hasNext()) {
 				p = (Parameter) it.next();
 				this.persist.persist(p.getName(), p.getAccessList(), p.getNotification(), p.getValue(), p.getType());
-				p.setPersist(this.persist);
+				// The following line is a non needed redundante line (i.e. the line just above already persist the
+				// data).
+				// p.setPersist(this.persist);
 			}
 			this.context.registerService(IParameterData.class.getName(), this.data, null);
 			this.com.setRunning(true);

@@ -29,8 +29,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.regexp.RE;
 
@@ -52,9 +50,8 @@ import com.francetelecom.admindm.soap.Soap;
  */
 public final class Parameter extends Observable {
 	/**
-	 * The check call back list. Each call back will be invoked and can throw an
-	 * Fault exception. Classic call back is check the minimum or the maximum
-	 * value allowed.
+	 * The check call back list. Each call back will be invoked and can throw an Fault exception. Classic call back is
+	 * check the minimum or the maximum value allowed.
 	 */
 	private List lsCheckCallBack = new ArrayList();
 
@@ -93,8 +90,7 @@ public final class Parameter extends Observable {
 	}
 
 	/**
-	 * The getter call back witch be call instead of basic getter if it's not
-	 * null.
+	 * The getter call back witch be call instead of basic getter if it's not null.
 	 */
 	private Getter getter = null;
 	/** The factory. */
@@ -622,7 +618,7 @@ public final class Parameter extends Observable {
 	protected static Long getDATE(final String key, final String value) {
 		Long result = null;
 		RE timeNoMilliRE = new RE(
-//		Pattern timeNoMilli = Pattern.compile(
+		// Pattern timeNoMilli = Pattern.compile(
 		// Absolute time 2009-01-01T00:00:00Z
 		// time zoned Z is optional
 				"(" + "[2][0-9][0-9][0-9]" + // 2000 to 2999
@@ -656,7 +652,7 @@ public final class Parameter extends Observable {
 						"([Z]|([/+|/-]([0][0-9]|[1][0-9])))?" + // 00 TIME ZONE
 						"");
 		RE timeMilliRE = new RE(
-//		Pattern timeMilli = Pattern.compile(
+		// Pattern timeMilli = Pattern.compile(
 		// Absolute time 2009-01-01T00:00:00.000Z
 		// time zoned Z is optional
 				"(" + "[2][0-9][0-9][0-9]" + // 2000 to 2999

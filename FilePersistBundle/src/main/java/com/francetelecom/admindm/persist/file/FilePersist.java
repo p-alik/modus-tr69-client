@@ -148,26 +148,18 @@ public final class FilePersist implements IPersist {
 	 */
 	public void persist(final String key, final String[] subscribers, final int notification, final Object value,
 			final int type) {
-
-		System.out.println("AC1982: 24 sept. 2014 11:05:34: FilePersist.persist(key: " + key + ", subscribers: "
-				+ subscribers + ", notification: " + notification + ", value: " + value + ", type: " + type);
-
+		// Log.debug("FilePersist.persist(key: " + key + ", subscribers: " + subscribers + ", notification: "
+		// + notification + ", value: " + value + ", type: " + type);
 		mapKey.put(key, new PersistElement(key, subscribers, notification, value));
 		try {
-			// Log.debug("dataSaveFile.createNewFile(): " + dataSaveFile.createNewFile());
 			// dataSaveFile.createNewFile(); - there is no need to execute this line; the file has been initialized in
-			// FilePersist constructor.
-			FileOutputStream ostream = new FileOutputStream(dataSaveFile);
-			ObjectOutputStream p = new ObjectOutputStream(ostream);
-			// System.out.println("AC1982: 24 sept. 2014 11:34:45: mapKey: " + mapKey);
-			// Iterator ki = mapKey.keySet().iterator();
-			// while (ki.hasNext()) {
-			// Object k = ki.next();
-			// System.out.println("AC1982: 24 sept. 2014 11:36:01: write: k: " + k + ", mapKey.get(k): "
-			// + mapKey.get(k));
-			// }
-			p.writeObject(mapKey);
-			ostream.close();
+			// FilePersist's constructor.
+
+			FileOutputStream fos = new FileOutputStream(dataSaveFile);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(mapKey);
+			// The fos must be closed after each writing.
+			fos.close();
 		} catch (IOException e) {
 			Log.error("ShouldNotOccured", e);
 		}
