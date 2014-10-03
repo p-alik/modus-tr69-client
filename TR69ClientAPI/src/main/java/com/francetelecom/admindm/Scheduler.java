@@ -42,6 +42,7 @@ import com.francetelecom.admindm.inform.ScheduleInform;
 import com.francetelecom.admindm.model.EventStruct;
 import com.francetelecom.admindm.model.IParameterData;
 import com.francetelecom.admindm.model.Parameter;
+import com.francetelecom.admindm.model.ParameterData;
 import com.francetelecom.admindm.persist.IPersist;
 
 /**
@@ -206,13 +207,14 @@ public final class Scheduler implements ServiceListener {
 			this.com.setRPCMng(RPCMethodMng.getInstance());
 			it = this.data.getParameterIterator();
 			// save data model
-			while (it.hasNext()) {
-				p = (Parameter) it.next();
-				this.persist.persist(p.getName(), p.getAccessList(), p.getNotification(), p.getValue(), p.getType());
-				// The following line is a non needed redundante line (i.e. the line just above already persist the
-				// data).
-				// p.setPersist(this.persist);
-			}
+			((ParameterData) this.data).setPersist(persist);
+//			while (it.hasNext()) {
+//				p = (Parameter) it.next();
+//				this.persist.persist(p.getName(), p.getAccessList(), p.getNotification(), p.getValue(), p.getType());
+//				// The following line is a non needed redundante line (i.e. the line just above already persist the
+//				// data).
+//				// p.setPersist(this.persist);
+//			}
 			this.context.registerService(IParameterData.class.getName(), this.data, null);
 			this.com.setRunning(true);
 			new Thread(this.com, "Com Server").start();

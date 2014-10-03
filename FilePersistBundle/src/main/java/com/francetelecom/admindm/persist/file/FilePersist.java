@@ -150,18 +150,26 @@ public final class FilePersist implements IPersist {
 			final int type) {
 		// Log.debug("FilePersist.persist(key: " + key + ", subscribers: " + subscribers + ", notification: "
 		// + notification + ", value: " + value + ", type: " + type);
-		mapKey.put(key, new PersistElement(key, subscribers, notification, value));
-		try {
-			// dataSaveFile.createNewFile(); - there is no need to execute this line; the file has been initialized in
-			// FilePersist's constructor.
-
-			FileOutputStream fos = new FileOutputStream(dataSaveFile);
-			ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(mapKey);
-			// The fos must be closed after each writing.
-			fos.close();
-		} catch (IOException e) {
-			Log.error("ShouldNotOccured", e);
+		// get existing PersistElement if available
+		PersistElement pe = (PersistElement) mapKey.get(key);
+		
+		// persist in file only if 
+		//   - no PersistElement exists for the key
+		//   - or one of the element field changed
+		if ((pe == null) || (!pe.equals(key, subscribers, notification, value))) {
+			mapKey.put(key, new PersistElement(key, subscribers, notification, value));
+			try {
+				// dataSaveFile.createNewFile(); - there is no need to execute this line; the file has been initialized in
+				// FilePersist's constructor.
+	
+				FileOutputStream fos = new FileOutputStream(dataSaveFile);
+				ObjectOutputStream oos = new ObjectOutputStream(fos);
+				oos.writeObject(mapKey);
+				// The fos must be closed after each writing.
+				fos.close();
+			} catch (IOException e) {
+				Log.error("ShouldNotOccured", e);
+			}
 		}
 	}
 

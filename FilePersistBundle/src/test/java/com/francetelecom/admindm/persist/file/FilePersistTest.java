@@ -48,7 +48,7 @@ public class FilePersistTest extends TestCase {
 		try {
 			FileUtil.CONFIG_FILE = "./src/test/resources/csv_unknow.txt";
 			FilePersist fp = new FilePersist();
-			fp.initializeData();
+//			fp.initializeData();
 			fail("Should throw an exception");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -242,6 +242,57 @@ public class FilePersistTest extends TestCase {
 			fail("exception should not occured");
 		}
 	}
+	
+	public void testPersistParameterWithTwoIdenticalParameters() throws Exception {
+		TestUtil.TRACE(this);
+		FileUtil.CONFIG_FILE = "./src/test/resources/csv.txt";
+		FilePersist fp = new FilePersist();
+		fp.initializeData();
+		Integer value = Integer.valueOf("45896");
+		fp.persist("test2", null, 0, value, FilePersist.INT);
+		
+		// check file 
+		File dataFile = FileUtil.getFileFromShortName(FileUtil.SAVE);
+		long lm1 = dataFile.lastModified();
+		
+		// persist again without any changes
+		fp.persist("test2", null, 0, value, FilePersist.INT);
+		
+		long lm2 = dataFile.lastModified();
+		
+		// the file MUST not be modified (i.e. lm1 == lm2)
+		assertTrue(lm1 == lm2);
+		
+	}
+	
+	public void testPersistParameterWithTwoDifferentParameters() throws Exception {
+		TestUtil.TRACE(this);
+		FileUtil.CONFIG_FILE = "./src/test/resources/csv.txt";
+
+		// delete previous test file to be fully clean
+		File dataFile = FileUtil.getFileFromShortName(FileUtil.SAVE);
+		dataFile.delete();
+		
+		FilePersist fp = new FilePersist();
+		fp.initializeData();
+		
+		Integer value = Integer.valueOf("45896");
+		fp.persist("test1", null, 0, value, FilePersist.INT);
+		
+		// check last modified date 
+		long lm1 = dataFile.lastModified();
+		
+		// persist again without any changes
+		fp.persist("test2", null, 0, value, FilePersist.INT);
+		
+		long lm2 = dataFile.lastModified();
+		
+		// the file MUST be modified (i.e. lm1 != lm2)
+		assertTrue(lm1 != lm2);
+		
+	}
+	
+	
 
 	/**
 	 * Assert array equals.
@@ -276,4 +327,6 @@ public class FilePersistTest extends TestCase {
 			fail("tab1 != tab2");
 		}
 	}
+	
+
 }

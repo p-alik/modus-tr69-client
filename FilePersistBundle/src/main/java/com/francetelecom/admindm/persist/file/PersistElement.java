@@ -22,6 +22,7 @@
 package com.francetelecom.admindm.persist.file;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class PersistElement implements Serializable {
 
@@ -54,6 +55,37 @@ public class PersistElement implements Serializable {
 		this.subscribers = subscribers;
 		this.notification = notification;
 		this.value = value;
+	}
+	
+	public boolean equals(String pKey, String[] pSubscribers, int pNotification, Object pValue) {
+		
+		// check key field
+		if ((key == null) && (pKey != null))  {
+			return false;
+		} else if ((key != null) && (!key.equals(pKey))) {
+			return false;
+		}
+		
+		// check notification field
+		if (notification != pNotification)  {
+			return false;
+		}
+		
+		// check subscribers array field
+		if ((subscribers == null) && (pSubscribers != null)) {
+			return false;
+		} else if ((subscribers != null) && (!Arrays.equals(subscribers, pSubscribers))) {
+			return false;
+		}
+		
+		// check value field
+		if ((value == null) && (pValue != null)) {
+			return false;
+		} else if ((value != null) && (!value.equals(pValue))) {
+			return false;
+		}
+			
+		return true;
 	}
 
 	public String toString() {
