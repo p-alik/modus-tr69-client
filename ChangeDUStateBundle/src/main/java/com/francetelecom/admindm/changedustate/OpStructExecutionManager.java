@@ -35,11 +35,7 @@ import org.osgi.framework.BundleException;
 import org.osgi.framework.ServiceReference;
 
 import com.francetelecom.admindm.api.EventCode;
-import com.francetelecom.admindm.api.ICom;
 import com.francetelecom.admindm.api.Log;
-import com.francetelecom.admindm.api.Session;
-import com.francetelecom.admindm.com.Com;
-import com.francetelecom.admindm.inform.Inform;
 import com.francetelecom.admindm.model.EventStruct;
 import com.francetelecom.admindm.model.IParameterData;
 import com.francetelecom.admindm.model.OpResultStruct;
@@ -113,19 +109,11 @@ public class OpStructExecutionManager implements Runnable {
 				// at this point, we are sure the list is not empty
 				changeDUStateToBeExecuted = (ChangeDUState) listOfChangeDUStateToBeExecuted.remove(0);
 			}
-//			synchronized (this.lock) {
-//				Iterator it = this.listOfChangeDUStateToBeExecuted.iterator();
-//				if (it.hasNext()) {
-//					changeDUStateToBeExecuted = (ChangeDUState) it.next();
-//				} // no "else" needed.
-//				this.listOfChangeDUStateToBeExecuted.remove(changeDUStateToBeExecuted);
-//			}
 
 			if (changeDUStateToBeExecuted != null) {
 				Log.debug("Start the execution of: " + changeDUStateToBeExecuted);
 				// Synchronously execute the current ChangeDUState.
-				// XXX AAA: The execution must be finished in a one hour
-				// time-slot.
+				// XXX AAA: The execution must be finished in a one hour time-slot.
 
 				String commandKey = changeDUStateToBeExecuted.getCommandKey();
 				Log.debug("The commandKey of the current changeDUStateToBeExecuted (changeDUStateToBeExecuted.getId(): "
@@ -145,342 +133,14 @@ public class OpStructExecutionManager implements Runnable {
 				for (int index = 0; index < operationsToBeExecuted.length; index = index + 1) {
 					OperationStruct operationToBeExecuted = operationsToBeExecuted[index];
 					if (OperationStruct.INSTALL.equals(operationToBeExecuted.getOperationStructType())) {
-						URL url = operationToBeExecuted.getUrl();
-						// uuid is expected to be null, here.
-						String uuid = operationToBeExecuted.getUuid();
-						String username = operationToBeExecuted.getUsername();
-						Log.debug("username: " + username);
-						String password = operationToBeExecuted.getPassword();
-						Log.debug("password: " + password);
-
-						// Assumption, there is only one EE.
-						String executionEnvRef = operationToBeExecuted.getExecutionEnvRef();
-						Log.debug("Assumption, there is only one EE (executionEnvRef: " + executionEnvRef + ")");
-
-						Log.debug("url: " + url);
-
-						// Check that a bundle having url as URL is NOT already
-						// deployed in the EE.
-						Bundle[] bundles = this.bundleContext.getBundles();
-						boolean bundleIsAlreadyDeployedInEE = false;
-						for (int i = 0; i < bundles.length; i = i + 1) {
-							Bundle bundle = bundles[i];
-							// Log.debug("bundle: " + bundle.getBundleId()
-							// + ", bundle.getLocation(): "
-							// + bundle.getLocation());
-							if (bundle.getLocation().equals(url.toString())) {
-								bundleIsAlreadyDeployedInEE = true;
-								break;
-							}
-						}
-
-						OpResultStruct opResultStruct = null;
-						/** I.e. the bundleId. */
-						String deploymentUnitRef = "";
-						String version = "";
-
-						if (bundleIsAlreadyDeployedInEE) {
-							String errorMessage = "Duplicate Deployment Unit: Bundle (located at url: " + url
-									+ ") is already deployed in EE.";
-							Log.error(errorMessage);
-							OpStructExecutionManagerException opStructExecutionManagerException = new OpStructExecutionManagerException(
-									errorMessage, null);
-							long startTime = System.currentTimeMillis();
-							long completeTime = startTime;
-							int pFaultcode = 9026;
-							Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
-									opStructExecutionManagerException);
-							opResultStruct = new OpResultStruct(uuid, deploymentUnitRef, version, CurrentState.Failed,
-									this.resolved, this.executionUnitRefList, startTime, completeTime, fault);
-						} else {
-							// Install the bundle located at url.
-							long startTime = System.currentTimeMillis();
-							try {
-								Bundle justInstalledBundle = this.bundleContext.installBundle(url.toString());
-								long completeTime = System.currentTimeMillis();
-
-								// Store data locally: given uuid, version via
-								// bundle.getheaders..., and bundleId.
-								version = (String) justInstalledBundle.getHeaders().get("Bundle-Version");
-								long justInstalledBundleId = justInstalledBundle.getBundleId();
-								uuid = Long.toString(justInstalledBundleId);
-								LocalData localDataOfTheJustInstalledBundle = new LocalData(justInstalledBundleId,
-										version);
-								Log.info("Bundle has been installed (localDataOfTheJustInstalledBundle: "
-										+ localDataOfTheJustInstalledBundle + ").");
-								this.localDataList.add(localDataOfTheJustInstalledBundle);
-
-								deploymentUnitRef = Long.toString(justInstalledBundleId);
-								// see Fault in TR-069 Issue 1 Amendment 4 Table
-								// 77 Page 118.
-								Fault fault = new Fault(0, "");
-								opResultStruct = new OpResultStruct(uuid, deploymentUnitRef, version,
-										CurrentState.Installed, this.resolved, this.executionUnitRefList, startTime,
-										completeTime, fault);
-							} catch (BundleException e) {
-								e.printStackTrace();
-								String errorMessage = "Request Denied: Installation of bundle located at: " + url
-										+ " failed.";
-								Log.error(errorMessage, e);
-								OpStructExecutionManagerException opStructExecutionManagerException = new OpStructExecutionManagerException(
-										errorMessage, e);
-								long completeTime = System.currentTimeMillis();
-								int pFaultcode = 9001;
-								Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
-										opStructExecutionManagerException);
-								opResultStruct = new OpResultStruct(uuid, deploymentUnitRef, version,
-										CurrentState.Failed, this.resolved, this.executionUnitRefList, startTime,
-										completeTime, fault);
-							}
-						}
-
-						// Add the installation result in opResultStructList
-						opResultStructList.add(opResultStruct);
+						opResultStructList.add(install(operationToBeExecuted));
 
 					} else if (OperationStruct.UPDATE.equals(operationToBeExecuted.getOperationStructType())) {
+						opResultStructList.add(update(operationToBeExecuted));
 
-						String uuid = operationToBeExecuted.getUuid();
-						String version = operationToBeExecuted.getVersion();
-						URL url = operationToBeExecuted.getUrl();
-						String username = operationToBeExecuted.getUsername();
-						Log.debug("username: " + username);
-						String password = operationToBeExecuted.getPassword();
-						Log.debug("password: " + password);
-
-						LocalData localDataOfTheBundleToBeUpdated = null;
-						Iterator localDataListIterator = this.localDataList.iterator();
-						while (localDataListIterator.hasNext()) {
-							LocalData localData = (LocalData) localDataListIterator.next();
-							if (uuid.equals(Long.toString(localData.getUuid()))) {
-								localDataOfTheBundleToBeUpdated = localData;
-								break;
-							}
-						}
-
-						OpResultStruct opResultStruct = null;
-						/** I.e. the bundleId. */
-						String deploymentUnitRef = "";
-						/** I.e. not the version of the bundle once updated. */
-						String currentVersionOfTheBundleToBeUpdated = "";
-
-						if (localDataOfTheBundleToBeUpdated == null) {
-							String errorMessage = "Unknown Deployment Unit: Update of bundle (uuid: " + uuid
-									+ "): failed. The targeted bundle is unknown by the system.";
-							Log.error(errorMessage);
-							OpStructExecutionManagerException opStructExecutionManagerException = new OpStructExecutionManagerException(
-									errorMessage, null);
-							long startTime = System.currentTimeMillis();
-							long completeTime = startTime;
-							int pFaultcode = 9028;
-							Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
-									opStructExecutionManagerException);
-							opResultStruct = new OpResultStruct(uuid, deploymentUnitRef,
-									currentVersionOfTheBundleToBeUpdated, CurrentState.Installed, this.resolved,
-									this.executionUnitRefList, startTime, completeTime, fault);
-						} else {
-							Bundle bundle = this.bundleContext.getBundle(localDataOfTheBundleToBeUpdated.getUuid());
-							if (bundle == null) {
-								String errorMessage = "Unknown Deployment Unit: Update of bundle(uuid: " + uuid
-										+ "): failed. Can't find the targeted bundle in the EE.";
-								Log.error(errorMessage);
-								OpStructExecutionManagerException opStructExecutionManagerException = new OpStructExecutionManagerException(
-										errorMessage, null);
-								long startTime = System.currentTimeMillis();
-								long completeTime = startTime;
-								int pFaultcode = 9028;
-								Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
-										opStructExecutionManagerException);
-								opResultStruct = new OpResultStruct(uuid, deploymentUnitRef,
-										currentVersionOfTheBundleToBeUpdated, CurrentState.Installed, this.resolved,
-										this.executionUnitRefList, startTime, completeTime, fault);
-							} else {
-								long startTime = System.currentTimeMillis();
-								try {
-									InputStream iS = url.openStream();
-									// Apache Felix bundle.update(iS) is
-									// equivalent to bundle.uninstall, and then
-									// install of the bundle located at iS ; BUT
-									// the bundleId is kept, i.e. the newly
-									// installed bundle has the same bundleId as
-									// the just uninstalled.
-									// XXX Is there a bug?!. in Apache Felix,
-									// the information displayed after a bundle
-									// update is updated, e.g.
-									// 32|Installed|1|XYZ(1.0.0) is updated to
-									// 32|Installed|1|XYZ(2.0.0), and in
-									// felix-cache, the bundle's .jar
-									// has been updated.
-									// BUT the bundle's location remains the
-									// same:
-									// 32|Installed|1|http://abc/XYZ-1.0.0.jar!
-									bundle.update(iS);
-
-									// Update the localData of the bundle that
-									// has been updated.
-									String versionOfTheUpdatedBundle = (String) bundle.getHeaders().get(
-											"Bundle-Version");
-									// If inputs are trusted, it is possible to
-									// use version instead of
-									// versionOfTheUpdatedBundle(that comes from
-									// the version data coming packaged with the
-									// bundle itself.
-									LocalData localDataOfTheUpdatedBundle = new LocalData(
-											localDataOfTheBundleToBeUpdated.getUuid(), versionOfTheUpdatedBundle);
-
-									// Remove the "old" localData associated to
-									// the bundle that was updated.
-									this.localDataList.remove(localDataOfTheBundleToBeUpdated);
-									// Add "new" localData corresponding to the
-									// "new" bundle.
-									this.localDataList.add(localDataOfTheUpdatedBundle);
-
-									Log.info("Bundle has been updated (updated local data of the just updated bundle: "
-											+ localDataOfTheUpdatedBundle + ")");
-
-									deploymentUnitRef = Long.toString(bundle.getBundleId());
-
-									long completeTime = System.currentTimeMillis();
-									// see Fault in TR-069 Issue 1 Amendment 4
-									// Table 77 Page 118.
-									Fault fault = new Fault(0, "");
-									opResultStruct = new OpResultStruct(uuid, deploymentUnitRef, version,
-											CurrentState.Installed, this.resolved, this.executionUnitRefList,
-											startTime, completeTime, fault);
-
-								} catch (IOException e) {
-									e.printStackTrace();
-									String errorMessage = "File transfert failure: Unable to contact file server. "
-											+ "Update of bundle (uuid: " + uuid + "): failed. IOException.";
-									Log.error(errorMessage, e);
-									OpStructExecutionManagerException opStructExecutionManagerException = new OpStructExecutionManagerException(
-											errorMessage, e);
-									long completeTime = System.currentTimeMillis();
-									int pFaultcode = 9015;
-									Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
-											opStructExecutionManagerException);
-									opResultStruct = new OpResultStruct(uuid, deploymentUnitRef,
-											currentVersionOfTheBundleToBeUpdated, CurrentState.Installed,
-											this.resolved, this.executionUnitRefList, startTime, completeTime, fault);
-								} catch (BundleException e) {
-									// BundleException - If the provided stream
-									// cannot be read or the update fails.
-									e.printStackTrace();
-									String errorMessage = "Request Denied: Update of bundle (uuid: " + uuid
-											+ "): failed. BundleException.";
-									Log.error(errorMessage, e);
-									OpStructExecutionManagerException opStructExecutionManagerException = new OpStructExecutionManagerException(
-											errorMessage, e);
-									long completeTime = System.currentTimeMillis();
-									int pFaultcode = 9001;
-									Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
-											opStructExecutionManagerException);
-									opResultStruct = new OpResultStruct(uuid, deploymentUnitRef,
-											currentVersionOfTheBundleToBeUpdated, CurrentState.Installed,
-											this.resolved, this.executionUnitRefList, startTime, completeTime, fault);
-								}
-							}
-						}
-
-						// Add the update result in opResultStructList
-						opResultStructList.add(opResultStruct);
 
 					} else if (OperationStruct.UNINSTALL.equals(operationToBeExecuted.getOperationStructType())) {
-
-						String uuid = operationToBeExecuted.getUuid();
-						String version = operationToBeExecuted.getVersion();
-
-						// Assumption, there is only one EE.
-						String executionEnvRef = operationToBeExecuted.getExecutionEnvRef();
-						Log.debug("Assumption, there is only one EE (executionEnvRef: " + executionEnvRef + ")");
-
-						LocalData localDataOfTheBundleToBeUninstalled = null;
-						Iterator localDataListIterator = this.localDataList.iterator();
-						while (localDataListIterator.hasNext()) {
-							LocalData localData = (LocalData) localDataListIterator.next();
-							// Check UUID
-							if (uuid.equals(Long.toString(localData.getUuid()))) {
-								// Check Version
-								if (version.equals(localData.getVersion())) {
-									localDataOfTheBundleToBeUninstalled = localData;
-									break;
-								}
-							}
-						}
-
-						OpResultStruct opResultStruct = null;
-						/** I.e. the bundleId. */
-						String deploymentUnitRef = "";
-						/** I.e. not the version of the bundle once updated. */
-						String currentVersionOfTheBundleToBeUpdated = "";
-
-						if (localDataOfTheBundleToBeUninstalled == null) {
-							String errorMessage = "Unknown Deployment Unit: Uninstall of bundle (uuid: " + uuid
-									+ " ): failed. The targeted bundle is unknown.";
-							Log.error(errorMessage);
-							OpStructExecutionManagerException opStructExecutionManagerException = new OpStructExecutionManagerException(
-									errorMessage, null);
-							long startTime = System.currentTimeMillis();
-							long completeTime = startTime;
-							int pFaultcode = 9028;
-							Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
-									opStructExecutionManagerException);
-							opResultStruct = new OpResultStruct(uuid, deploymentUnitRef,
-									currentVersionOfTheBundleToBeUpdated, CurrentState.Installed, this.resolved,
-									this.executionUnitRefList, startTime, completeTime, fault);
-						} else {
-							Bundle bundle = this.bundleContext.getBundle(localDataOfTheBundleToBeUninstalled.getUuid());
-							if (bundle == null) {
-								String errorMessage = "Unknown Deployment Unit: Uninstall of bundle (uuid: " + uuid
-										+ " ): failed. Can't find the targeted bundle in the EE.";
-								Log.error(errorMessage);
-								OpStructExecutionManagerException opStructExecutionManagerException = new OpStructExecutionManagerException(
-										errorMessage, null);
-								long startTime = System.currentTimeMillis();
-								long completeTime = startTime;
-								int pFaultcode = 9028;
-								Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
-										opStructExecutionManagerException);
-								opResultStruct = new OpResultStruct(uuid, deploymentUnitRef,
-										currentVersionOfTheBundleToBeUpdated, CurrentState.Installed, this.resolved,
-										this.executionUnitRefList, startTime, completeTime, fault);
-							} else {
-								long startTime = System.currentTimeMillis();
-								try {
-									deploymentUnitRef = Long.toString(bundle.getBundleId());
-									bundle.uninstall();
-									// Remove the localData associated to the
-									// just uninstalled bundle.
-									this.localDataList.remove(localDataOfTheBundleToBeUninstalled);
-									Log.info("Bundle has been uninstalled.");
-
-									long completeTime = System.currentTimeMillis();
-									// see Fault in TR-069 Issue 1 Amendment 4
-									// Table 77 Page 118.
-									Fault fault = new Fault(0, "");
-
-									opResultStruct = new OpResultStruct(uuid, deploymentUnitRef, version,
-											CurrentState.Uninstalled, this.resolved, this.executionUnitRefList,
-											startTime, completeTime, fault);
-								} catch (BundleException e) {
-									e.printStackTrace();
-									String errorMessage = "Request Denied: Uninstall of bundle (uuid: " + uuid
-											+ " ): failed. BundleException.";
-									Log.error(errorMessage, e);
-									OpStructExecutionManagerException opStructExecutionManagerException = new OpStructExecutionManagerException(
-											errorMessage, null);
-									long completeTime = startTime;
-									int pFaultcode = 9001;
-									Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
-											opStructExecutionManagerException);
-									opResultStruct = new OpResultStruct(uuid, deploymentUnitRef,
-											currentVersionOfTheBundleToBeUpdated, CurrentState.Installed,
-											this.resolved, this.executionUnitRefList, startTime, completeTime, fault);
-								}
-							}
-						}
-
-						// Add the uninstallation result in opResultStructList
-						opResultStructList.add(opResultStruct);
+						opResultStructList.add(uninstall(operationToBeExecuted));
 
 					} else {
 						// XXX AAA: handle this error.
@@ -493,14 +153,12 @@ public class OpStructExecutionManager implements Runnable {
 
 				// Emit an Inform(... DU STATE CHANGE COMPLETE, M ChangeDUState
 				// ...); from CPE to ACS.
-
 				
 				ServiceReference parameterDataSr = bundleContext.getServiceReference(IParameterData.class.getName());
 				IParameterData parameterData = null;
 				if (parameterDataSr != null) {
 					parameterData = (IParameterData) bundleContext.getService(parameterDataSr);
 				}
-				
 				
 				if (parameterData != null) {
 					parameterData.addEvent(new EventStruct(
@@ -510,7 +168,6 @@ public class OpStructExecutionManager implements Runnable {
 							opResultStructList, commandKey, "1");
 					parameterData.addOutgoingRequest(duStateChangeComplete);
 				}
-
 
 			} else {
 				// Log.debug("There is no ChangeDUState to execute.");
@@ -528,12 +185,318 @@ public class OpStructExecutionManager implements Runnable {
 	}
 
 	public void shutdown() {
-		// replace deprecated "this.thread.stop();" with the following lines of
-		// code.
+		// replace deprecated "this.thread.stop();" with the following lines of code.
 		try {
 			this.thread.interrupt();
 		} catch (Exception e) {
 			Log.debug("OpStructExecutionManager.shutdown() throw an Exception that should/can be ignored.");
 		}
 	}
+
+	private OpResultStruct install(final OperationStruct operationToBeExecuted) {
+		URL url = operationToBeExecuted.getUrl();
+		// uuid is expected to be null, here.
+		String uuid = operationToBeExecuted.getUuid();
+		String username = operationToBeExecuted.getUsername();
+		Log.debug("username: " + username);
+		String password = operationToBeExecuted.getPassword();
+		Log.debug("password: " + password);
+
+		// Assumption, there is only one EE.
+		String executionEnvRef = operationToBeExecuted.getExecutionEnvRef();
+		Log.debug("Assumption, there is only one EE (executionEnvRef: " + executionEnvRef + ")");
+
+		Log.debug("url: " + url);
+
+		// Check that a bundle having url as URL is NOT already
+		// deployed in the EE.
+		Bundle[] bundles = this.bundleContext.getBundles();
+		boolean bundleIsAlreadyDeployedInEE = false;
+		for (int i = 0; i < bundles.length; i = i + 1) {
+			Bundle bundle = bundles[i];
+			// Log.debug("bundle: " + bundle.getBundleId()  + ", bundle.getLocation(): "
+			// + bundle.getLocation());
+			if (bundle.getLocation().equals(url.toString())) {
+				bundleIsAlreadyDeployedInEE = true;
+				break;
+			}
+		}
+
+		/** I.e. the bundleId. */
+		String deploymentUnitRef = "";
+		String version = "";
+
+		if (bundleIsAlreadyDeployedInEE) {
+			String errorMessage = "Duplicate Deployment Unit: Bundle (located at url: " + url
+					+ ") is already deployed in EE.";
+			Log.error(errorMessage);
+			OpStructExecutionManagerException opStructExecutionManagerException = 
+					new OpStructExecutionManagerException(errorMessage, null);
+			long startTime = System.currentTimeMillis();
+			long completeTime = startTime;
+			int pFaultcode = 9026;
+			Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
+					opStructExecutionManagerException);
+			return new OpResultStruct(uuid, deploymentUnitRef, version, CurrentState.Failed,
+					this.resolved, this.executionUnitRefList, startTime, completeTime, fault);
+		}
+
+		// Install the bundle located at url.
+		long startTime = System.currentTimeMillis();
+		try {
+			Bundle justInstalledBundle = this.bundleContext.installBundle(url.toString());
+			long completeTime = System.currentTimeMillis();
+
+			// Store data locally: given uuid, version via
+			// bundle.getheaders..., and bundleId.
+			version = (String) justInstalledBundle.getHeaders().get("Bundle-Version");
+			long justInstalledBundleId = justInstalledBundle.getBundleId();
+			uuid = Long.toString(justInstalledBundleId);
+			LocalData localDataOfTheJustInstalledBundle = 
+					new LocalData(justInstalledBundleId, version);
+			Log.info("Bundle has been installed (localDataOfTheJustInstalledBundle: "
+					+ localDataOfTheJustInstalledBundle + ").");
+			this.localDataList.add(localDataOfTheJustInstalledBundle);
+
+			deploymentUnitRef = Long.toString(justInstalledBundleId);
+			// see Fault in TR-069 Issue 1 Amendment 4 Table
+			// 77 Page 118.
+			Fault fault = new Fault(0, "");
+			return new OpResultStruct(uuid, deploymentUnitRef, version,
+					CurrentState.Installed, this.resolved, this.executionUnitRefList, startTime,
+					completeTime, fault);
+		} catch (BundleException e) {
+			e.printStackTrace();
+			String errorMessage = "Request Denied: Installation of bundle located at: " + url
+					+ " failed.";
+			Log.error(errorMessage, e);
+			OpStructExecutionManagerException opStructExecutionManagerException = 
+					new OpStructExecutionManagerException(errorMessage, e);
+			long completeTime = System.currentTimeMillis();
+			int pFaultcode = 9001;
+			Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
+					opStructExecutionManagerException);
+			return new OpResultStruct(uuid, deploymentUnitRef, version,
+					CurrentState.Failed, this.resolved, this.executionUnitRefList, startTime,
+					completeTime, fault);
+		}
+	}
+
+	private OpResultStruct update(final OperationStruct operationToBeExecuted) {
+		String uuid = operationToBeExecuted.getUuid();
+		String version = operationToBeExecuted.getVersion();
+		URL url = operationToBeExecuted.getUrl();
+		String username = operationToBeExecuted.getUsername();
+		Log.debug("username: " + username);
+		String password = operationToBeExecuted.getPassword();
+		Log.debug("password: " + password);
+
+		LocalData localDataOfTheBundleToBeUpdated = null;
+		Iterator localDataListIterator = this.localDataList.iterator();
+		while (localDataListIterator.hasNext()) {
+			LocalData localData = (LocalData) localDataListIterator.next();
+			if (uuid.equals(Long.toString(localData.getUuid()))) {
+				localDataOfTheBundleToBeUpdated = localData;
+				break;
+			}
+		}
+
+		/** I.e. the bundleId. */
+		String deploymentUnitRef = "";
+		/** I.e. not the version of the bundle once updated. */
+		String currentVersionOfTheBundleToBeUpdated = "";
+
+		Bundle bundle = null;
+		if (localDataOfTheBundleToBeUpdated == null) {
+			try {
+				bundle = this.bundleContext.getBundle(Long.parseLong(uuid));
+			} catch (NumberFormatException ignored) {
+			}
+		} else {
+			bundle = this.bundleContext.getBundle(localDataOfTheBundleToBeUpdated.getUuid());
+		}
+
+		if (bundle == null) {
+			String errorMessage = "Unknown Deployment Unit: Update of bundle(uuid: " + uuid
+					+ "): failed. Can't find the targeted bundle in the EE.";
+			Log.error(errorMessage);
+			OpStructExecutionManagerException opStructExecutionManagerException = 
+					new OpStructExecutionManagerException(errorMessage, null);
+			long startTime = System.currentTimeMillis();
+			long completeTime = startTime;
+			int pFaultcode = 9028;
+			Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
+					opStructExecutionManagerException);
+			return new OpResultStruct(uuid, deploymentUnitRef,
+					currentVersionOfTheBundleToBeUpdated, CurrentState.Installed, this.resolved,
+					this.executionUnitRefList, startTime, completeTime, fault);
+		}
+
+		long startTime = System.currentTimeMillis();
+		try {
+			InputStream iS = url.openStream();
+			// Apache Felix bundle.update(iS) is equivalent to bundle.uninstall, and then
+			// install of the bundle located at iS ; BUT the bundleId is kept, i.e. the newly
+			// installed bundle has the same bundleId as the just uninstalled.
+			// XXX Is there a bug?!. in Apache Felix, the information displayed after a bundle
+			// update is updated, e.g.
+			// 32|Installed|1|XYZ(1.0.0) is updated to 32|Installed|1|XYZ(2.0.0), and in
+			// felix-cache, the bundle's .jar has been updated.
+			// BUT the bundle's location remains the same:
+			// 32|Installed|1|http://abc/XYZ-1.0.0.jar!
+			bundle.update(iS);
+
+			// Update the localData of the bundle that has been updated.
+			String versionOfTheUpdatedBundle = (String) bundle.getHeaders().get(
+					"Bundle-Version");
+			// If inputs are trusted, it is possible to use version instead of
+			// versionOfTheUpdatedBundle(that comes from
+			// the version data coming packaged with the bundle itself.
+			LocalData localDataOfTheUpdatedBundle = new LocalData(
+					bundle.getBundleId(), versionOfTheUpdatedBundle);
+
+			// Remove the "old" localData associated to the bundle that was updated.
+			if (localDataOfTheBundleToBeUpdated != null) {
+				this.localDataList.remove(localDataOfTheBundleToBeUpdated);
+			}
+			// Add "new" localData corresponding to the "new" bundle.
+			this.localDataList.add(localDataOfTheUpdatedBundle);
+
+			Log.info("Bundle has been updated (updated local data of the just updated bundle: "
+					+ localDataOfTheUpdatedBundle + ")");
+
+			deploymentUnitRef = Long.toString(bundle.getBundleId());
+
+			long completeTime = System.currentTimeMillis();
+			// see Fault in TR-069 Issue 1 Amendment 4
+			// Table 77 Page 118.
+			Fault fault = new Fault(0, "");
+			return new OpResultStruct(uuid, deploymentUnitRef, version,
+					CurrentState.Installed, this.resolved, this.executionUnitRefList,
+					startTime, completeTime, fault);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			String errorMessage = "File transfert failure: Unable to contact file server. "
+					+ "Update of bundle (uuid: " + uuid + "): failed. IOException.";
+			Log.error(errorMessage, e);
+			OpStructExecutionManagerException opStructExecutionManagerException = 
+					new OpStructExecutionManagerException(errorMessage, e);
+			long completeTime = System.currentTimeMillis();
+			int pFaultcode = 9015;
+			Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
+					opStructExecutionManagerException);
+			return new OpResultStruct(uuid, deploymentUnitRef,
+					currentVersionOfTheBundleToBeUpdated, CurrentState.Installed,
+					this.resolved, this.executionUnitRefList, startTime, completeTime, fault);
+		} catch (BundleException e) {
+			// BundleException - If the provided stream
+			// cannot be read or the update fails.
+			e.printStackTrace();
+			String errorMessage = "Request Denied: Update of bundle (uuid: " + uuid
+					+ "): failed. BundleException.";
+			Log.error(errorMessage, e);
+			OpStructExecutionManagerException opStructExecutionManagerException = 
+					new OpStructExecutionManagerException(errorMessage, e);
+			long completeTime = System.currentTimeMillis();
+			int pFaultcode = 9001;
+			Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
+					opStructExecutionManagerException);
+			return new OpResultStruct(uuid, deploymentUnitRef,
+					currentVersionOfTheBundleToBeUpdated, CurrentState.Installed,
+					this.resolved, this.executionUnitRefList, startTime, completeTime, fault);
+		}
+	}
+
+	private OpResultStruct uninstall(final OperationStruct operationToBeExecuted) {
+		String uuid = operationToBeExecuted.getUuid();
+		String version = operationToBeExecuted.getVersion();
+
+		// Assumption, there is only one EE.
+		String executionEnvRef = operationToBeExecuted.getExecutionEnvRef();
+		Log.debug("Assumption, there is only one EE (executionEnvRef: " + executionEnvRef + ")");
+
+		LocalData localDataOfTheBundleToBeUninstalled = null;
+		Iterator localDataListIterator = this.localDataList.iterator();
+		while (localDataListIterator.hasNext()) {
+			LocalData localData = (LocalData) localDataListIterator.next();
+			// Check UUID
+			if (uuid.equals(Long.toString(localData.getUuid())) 
+					&& version.equals(localData.getVersion())) {
+				localDataOfTheBundleToBeUninstalled = localData;
+				break;
+			}
+		}
+
+		/** I.e. the bundleId. */
+		String deploymentUnitRef = "";
+		/** I.e. not the version of the bundle once updated. */
+		String currentVersionOfTheBundleToBeUpdated = "";
+
+		Bundle bundle = null;
+		if (localDataOfTheBundleToBeUninstalled == null) {
+			try {
+				bundle = this.bundleContext.getBundle(Long.parseLong(uuid));
+				// check version
+				if (! bundle.getHeaders().get("Bundle-Version").equals(version)) {
+					Log.error("Installed bundle has same ID but different versions "
+							+ "with bundle to be uninstalled");
+					bundle = null;
+				}
+			} catch (Exception ignored) {
+			}
+		} else {
+			bundle = this.bundleContext.getBundle(localDataOfTheBundleToBeUninstalled.getUuid());
+		}
+
+		if (bundle == null) {
+			String errorMessage = "Unknown Deployment Unit: Uninstall of bundle (uuid: " + uuid
+					+ " ): failed. Can't find the targeted bundle in the EE.";
+			Log.error(errorMessage);
+			OpStructExecutionManagerException opStructExecutionManagerException = 
+					new OpStructExecutionManagerException(errorMessage, null);
+			long startTime = System.currentTimeMillis();
+			long completeTime = startTime;
+			int pFaultcode = 9028;
+			Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
+					opStructExecutionManagerException);
+			return new OpResultStruct(uuid, deploymentUnitRef,
+					currentVersionOfTheBundleToBeUpdated, CurrentState.Installed, this.resolved,
+					this.executionUnitRefList, startTime, completeTime, fault);
+		}
+
+		long startTime = System.currentTimeMillis();
+		try {
+			deploymentUnitRef = Long.toString(bundle.getBundleId());
+			bundle.uninstall();
+			if (localDataOfTheBundleToBeUninstalled != null) {
+				// Remove the localData associated to the just uninstalled bundle.
+				this.localDataList.remove(localDataOfTheBundleToBeUninstalled);
+			}
+			Log.info("Bundle has been uninstalled.");
+
+			long completeTime = System.currentTimeMillis();
+			// see Fault in TR-069 Issue 1 Amendment 4
+			// Table 77 Page 118.
+			Fault fault = new Fault(0, "");
+			return new OpResultStruct(uuid, deploymentUnitRef, version,
+					CurrentState.Uninstalled, this.resolved, this.executionUnitRefList,
+					startTime, completeTime, fault);
+		} catch (BundleException e) {
+			e.printStackTrace();
+			String errorMessage = "Request Denied: Uninstall of bundle (uuid: " + uuid
+					+ " ): failed. BundleException.";
+			Log.error(errorMessage, e);
+			OpStructExecutionManagerException opStructExecutionManagerException = 
+					new OpStructExecutionManagerException(errorMessage, null);
+			long completeTime = startTime;
+			int pFaultcode = 9001;
+			Fault fault = new Fault(pFaultcode, opStructExecutionManagerException.getMessage(),
+					opStructExecutionManagerException);
+			return new OpResultStruct(uuid, deploymentUnitRef,
+					currentVersionOfTheBundleToBeUpdated, CurrentState.Installed,
+					this.resolved, this.executionUnitRefList, startTime, completeTime, fault);
+		}
+	}
+
 }

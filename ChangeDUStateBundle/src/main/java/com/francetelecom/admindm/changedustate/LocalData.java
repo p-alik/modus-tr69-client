@@ -55,6 +55,21 @@ public class LocalData {
 		return this.version;
 	}
 
+	public int hashCode() {
+		int result = 31 + (int) (uuid ^ (uuid >>> 32));
+		return 31 * result + ((version == null) ? 0 : version.hashCode());
+	}
+
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if ((obj == null) || (getClass() != obj.getClass()))
+			return false;
+		LocalData other = (LocalData) obj;
+		return (uuid == other.uuid) 
+			&& ((version == null) ? (other.version == null) : version.equals(other.version));
+	}
+
 	/**
 	 * @see java.lang.Object#toString()
 	 */
