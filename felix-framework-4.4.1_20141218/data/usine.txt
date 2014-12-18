@@ -1,0 +1,24 @@
+# 
+# This file is used to by the Device Adapter to Set/Get values
+# This file must be updated with your own parameters values
+# 
+DeviceInfo.Manufacturer=AA_SHINE-MADE
+DeviceInfo.ManufacturerOUI=0AA00C
+DeviceInfo.ProductClass=Device-HomeAPI
+DeviceInfo.SerialNumber=%%_TODO_DEFINE_THIS_VALUE_%%
+DeviceInfo.HardwareVersion=HV1.0
+DeviceInfo.SoftwareVersion=SV1.1
+DeviceInfo.ProvisioningCode=
+DeviceInfo.SpecVersion=1.0
+#DeviceInfo.Description = type of HAB: Livebox (default), Raspberry, ... Used by IF9.
+DeviceInfo.Description=Raspberry
+#AAA.BBB=CCC
+ManagementServer.ConnectionRequestPassword=orange
+ManagementServer.URL=http://g-acsdev.rd.francetelecom.fr:8080/nbbsora/tr69
+ManagementServer.STUNServerAddress=
+ManagementServer.STUNServerPort=3478
+ManagementServer.STUNEnable=
+ManagementServer.ConnectionRequestUsername=
+ManagementServer.ConnectionRequestPassword=
+ManagementServer.STUNMaximumKeepAlivePeriod=30
+ManagementServer.STUNMinimumKeepAlivePeriod=30
