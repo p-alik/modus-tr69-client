@@ -21,7 +21,8 @@
  * Author: Antonin Chazalet - Orange
  */
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<!--parent>
@@ -32,7 +33,7 @@
 
 	<groupId>com.francetelecom.acse.modus</groupId>
 	<artifactId>modus-clientTR69</artifactId>
-	<version>1.1.5</version>
+	<version>1.1.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>${project.artifactId}</name>
 	<description>Client TR69</description>
@@ -42,7 +43,7 @@
 			<name>Olivier Beyler</name>
 			<organization>Orange</organization>
 			<organizationUrl>orange.com</organizationUrl>
-			<email />
+			<email></email>
 		</developer>
 		<developer>
 			<name>Antonin Chazalet</name>
@@ -240,9 +241,9 @@
 	</reporting>
 
 	<scm>
-		<connection>scm:svn:https://orangeforge.rd.francetelecom.fr/svnroot/Modus/trunk/ClientTR69/tags/modus-clientTR69-1.1.5</connection>
-		<developerConnection>scm:svn:https://orangeforge.rd.francetelecom.fr/svnroot/Modus/trunk/ClientTR69/tags/modus-clientTR69-1.1.5</developerConnection>
-		<url>https://orangeforge.rd.francetelecom.fr/svnroot/Modus/trunk/ClientTR69/tags/modus-clientTR69-1.1.5</url>
+		<connection>scm:svn:https://orangeforge.rd.francetelecom.fr/svnroot/Modus/trunk/ClientTR69/trunk</connection>
+		<developerConnection>scm:svn:https://orangeforge.rd.francetelecom.fr/svnroot/Modus/trunk/ClientTR69/trunk</developerConnection>
+		<url>https://orangeforge.rd.francetelecom.fr/svnroot/Modus/trunk/ClientTR69/trunk</url>
 	</scm>
 
 </project>
