@@ -241,9 +241,9 @@
 	</reporting>
 
 	<scm>
-		<connection>scm:svn:https://orangeforge.rd.francetelecom.fr/svnroot/Modus/trunk/ClientTR69/trunk</connection>
-		<developerConnection>scm:svn:https://orangeforge.rd.francetelecom.fr/svnroot/Modus/trunk/ClientTR69/trunk</developerConnection>
-		<url>https://orangeforge.rd.francetelecom.fr/svnroot/Modus/trunk/ClientTR69/trunk</url>
+		<connection>scm:svn:https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/trunk</connection>
+		<developerConnection>scm:svn:https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/trunk</developerConnection>
+		<url>https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/trunk</url>
 	</scm>
 
 </project>
