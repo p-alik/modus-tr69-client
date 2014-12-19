@@ -25,7 +25,7 @@
 	<parent>
 		<groupId>com.francetelecom.acse.modus</groupId>
 		<artifactId>modus-clientTR69</artifactId>
-		<version>1.1.5-SNAPSHOT</version>
+		<version>1.1.5</version>
 	</parent>
 	<artifactId>TR69ClientAPI</artifactId>
 	<packaging>bundle</packaging>
@@ -84,7 +84,7 @@
 		<dependency>
 			<groupId>com.francetelecom.acse.modus</groupId>
 			<artifactId>IPersistBundle</artifactId>
-			<version>1.1.5-SNAPSHOT</version>
+			<version>1.1.5</version>
 		</dependency>
 		<dependency>
 			<groupId>jakarta-regexp</groupId>
