@@ -21,8 +21,7 @@
  * Author: Antonin Chazalet - Orange
  */
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<!--parent>
@@ -33,7 +32,7 @@
 
 	<groupId>com.francetelecom.acse.modus</groupId>
 	<artifactId>modus-clientTR69</artifactId>
-	<version>1.1.5-SNAPSHOT</version>
+	<version>1.1.5</version>
 	<packaging>pom</packaging>
 	<name>${project.artifactId}</name>
 	<description>Client TR69</description>
@@ -43,7 +42,7 @@
 			<name>Olivier Beyler</name>
 			<organization>Orange</organization>
 			<organizationUrl>orange.com</organizationUrl>
-			<email></email>
+			<email />
 		</developer>
 		<developer>
 			<name>Antonin Chazalet</name>
@@ -241,9 +240,9 @@
 	</reporting>
 
 	<scm>
-		<connection>scm:svn:https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/trunk</connection>
-		<developerConnection>scm:svn:https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/trunk</developerConnection>
-		<url>https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/trunk</url>
+		<connection>scm:svn:https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/tags/modus-clientTR69-1.1.5</connection>
+		<developerConnection>scm:svn:https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/tags/modus-clientTR69-1.1.5</developerConnection>
+		<url>https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/tags/modus-clientTR69-1.1.5</url>
 	</scm>
 
 </project>
