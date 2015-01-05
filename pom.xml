@@ -134,7 +134,18 @@
 					</dependency> -->
 				</dependencies>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
+				<dependencies>
+					<dependency>
+						<groupId>com.google.code.maven-svn-wagon</groupId>
+						<artifactId>maven-svn-wagon</artifactId>
+						<version>1.4</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -244,5 +255,12 @@
 		<developerConnection>scm:svn:https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/trunk</developerConnection>
 		<url>https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/trunk</url>
 	</scm>
+	
+	<distributionManagement>
+        <repository>
+            <id>svn.code.sf.net</id>
+            <url>svn:https://svn.code.sf.net/p/modus-tr-069/code/maven_repo/</url>
+        </repository>
+    </distributionManagement>
 
 </project>
