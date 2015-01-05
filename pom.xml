@@ -32,7 +32,7 @@
 
 	<groupId>com.francetelecom.acse.modus</groupId>
 	<artifactId>modus-clientTR69</artifactId>
-	<version>1.1.6</version>
+	<version>1.1.7-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>${project.artifactId}</name>
 	<description>Client TR69</description>
@@ -251,9 +251,9 @@
 	</reporting>
 
 	<scm>
-		<connection>scm:svn:https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/tags/modus-clientTR69-1.1.6</connection>
-		<developerConnection>scm:svn:https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/tags/modus-clientTR69-1.1.6</developerConnection>
-		<url>https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/tags/modus-clientTR69-1.1.6</url>
+		<connection>scm:svn:https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/trunk</connection>
+		<developerConnection>scm:svn:https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/trunk</developerConnection>
+		<url>https://svn.code.sf.net/p/modus-tr-069/code/branches/1.1.5-SNAPSHOT/trunk</url>
 	</scm>
 	
 	<distributionManagement>
