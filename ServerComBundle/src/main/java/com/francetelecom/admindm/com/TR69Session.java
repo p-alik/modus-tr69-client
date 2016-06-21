@@ -54,6 +54,19 @@ import com.francetelecom.admindm.soap.Soap;
  * The Class Session.
  */
 public final class TR69Session implements Session {
+	static {
+		//for trustedHost testing only
+		javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
+				new javax.net.ssl.HostnameVerifier(){
+					public boolean verify(String hostname,
+							javax.net.ssl.SSLSession sslSession) {
+						String trustHost = System.getProperty("trustedHost");
+						Log.debug("verify: '"+ hostname +"'; trustHost: '"+trustHost+"'");
+						return hostname.equals(trustHost);
+					}
+				});
+	};
+
 	private static final String INDENT_OUTPUT = "http://xmlpull.org/v1/doc/features.html#indent-output";
 	/** The Constant HTTP_200. */
 	private static final int HTTP_200 = 200;
