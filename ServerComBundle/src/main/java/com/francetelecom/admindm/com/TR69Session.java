@@ -435,6 +435,7 @@ public final class TR69Session implements Session {
 				}
 			}
 		} catch (IOException e) {
+			Log.error("IOException: ", e);
 			StringBuffer error = new StringBuffer(FaultUtil.STR_FAULT_9002);
 			error.append(" " + "IOException while connect on \"");
 			error.append(this.serverURL);
