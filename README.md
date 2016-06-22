@@ -7,7 +7,7 @@ modus-tr69-client
    - [SSL hostname verification for ManagementServer.URL](https://github.com/p-alik/modus-tr69-client/commit/c0571595319a281afd453b1380b9d520dea0028b)
    - [add maven assemble configuration for 1.1.7-SNAPSHOT](https://github.com/p-alik/modus-tr69-client/commit/e9d79331e622f92f8f70c8425c70183d62d3a78d)
 
-Install/Assabmle
+Build/Assebmle/Install
 ----------------
 
 
