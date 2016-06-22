@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 
@@ -55,16 +56,19 @@ import com.francetelecom.admindm.soap.Soap;
  */
 public final class TR69Session implements Session {
 	static {
-		//for trustedHost testing only
 		javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
-				new javax.net.ssl.HostnameVerifier(){
-					public boolean verify(String hostname,
-							javax.net.ssl.SSLSession sslSession) {
-						String trustHost = System.getProperty("trustedHost");
-						Log.debug("verify: '"+ hostname +"'; trustHost: '"+trustHost+"'");
-						return hostname.equals(trustHost);
-					}
-				});
+			new javax.net.ssl.HostnameVerifier() {
+				/**
+				 * returns true for managementServer only
+				 */
+				public boolean verify(String hostname,
+						javax.net.ssl.SSLSession sslSession) {
+					String h = System.getProperty("managementServer");
+					Log.debug("verify: '" + hostname + "', managementServer: '" + h + "'");
+
+					return hostname.equals(h);
+				}
+			});
 	};
 
 	private static final String INDENT_OUTPUT = "http://xmlpull.org/v1/doc/features.html#indent-output";
@@ -182,6 +186,11 @@ public final class TR69Session implements Session {
 			error.append("ManagementServer.URL is not defined");
 			throw new Fault(FaultUtil.FAULT_9002, error.toString());
 		}
+
+		if (this.serverURL.toLowerCase().startsWith("https")) {
+			this.setSystemPropertyManagementServer();
+		}
+
 		this.lastRPCMethod = new Inform(this.parameterData, this.retryCount);
 		this.lastRPCMethod.setId(this.id);
 		this.holdRequest = false;
@@ -207,6 +216,21 @@ public final class TR69Session implements Session {
 			doSoapRequest(null, this.id);
 		} else {
 			Log.debug("No event -> no session");
+		}
+	}
+
+	/**
+	 * set system property managementServer
+	 * it will be used by
+	 * javax.net.ssl.HostnameVerifier()
+	 * see above
+	 */
+	private void setSystemPropertyManagementServer() {
+		try {
+			URL url = new URL(this.serverURL);
+			System.setProperty("managementServer", url.getHost());
+		} catch (MalformedURLException e) {
+			Log.error(e.toString());
 		}
 	}
 
