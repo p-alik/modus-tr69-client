@@ -3,8 +3,8 @@ modus-tr69-client
 
  - [origin project site](http://modus-tr-069.sourceforge.net/)
  - this repository is a clone of SVN branch [1.1.5-SNAPSHOT/trunk]((https://sourceforge.net/p/modus-tr-069/code/HEAD/tree/branches/1.1.5-SNAPSHOT/trunk/)) available by [sourceforge.net](https://sourceforge.net/projects/modus-tr-069/)
- - the only significant changes are did:
-   - [SSL hostname verifiecation for ManagementServer.URL](https://github.com/p-alik/modus-tr69-client/commit/c0571595319a281afd453b1380b9d520dea0028b)
+ - the only significant changes:
+   - [SSL hostname verification for ManagementServer.URL](https://github.com/p-alik/modus-tr69-client/commit/c0571595319a281afd453b1380b9d520dea0028b)
    - [add maven assemble configuration for 1.1.7-SNAPSHOT](https://github.com/p-alik/modus-tr69-client/commit/e9d79331e622f92f8f70c8425c70183d62d3a78d)
 
 Install/Assabmle
