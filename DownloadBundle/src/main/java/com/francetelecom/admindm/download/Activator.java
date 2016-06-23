@@ -130,7 +130,13 @@ public final class Activator implements BundleActivator {
 			rpcMng.unregisterEventBehavior(EventCode.M_DOWNLOAD);
 			rpcMng.unregisterEventBehavior(EventCode.TRANSFER_COMPLETE);
 		}
-		context.ungetService(rpcMethodMngServiceRef);
-		context.ungetService(dataServiceRef);
+
+		if (rpcMethodMngServiceRef != null) {
+			context.ungetService(rpcMethodMngServiceRef);
+		}
+
+		if(dataServiceRef != null) {
+			context.ungetService(dataServiceRef);
+		}
 	}
 }
