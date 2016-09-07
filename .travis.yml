@@ -1,0 +1,6 @@
+sudo: false
+language: java
+jdk:
+  - oraclejdk6
+script: mvn clean assembly:assembly
+
