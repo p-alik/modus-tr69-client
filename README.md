@@ -1,6 +1,9 @@
 modus-tr69-client
 =================
 
+[![Build Status](https://travis-ci.org/p-alik/modus-tr69-client.png)](https://travis-ci.org/p-alik/modus-tr69-client)
+
+
  - [origin project site](http://modus-tr-069.sourceforge.net/)
  - this repository is a clone of SVN branch [1.1.5-SNAPSHOT/trunk]((https://sourceforge.net/p/modus-tr-069/code/HEAD/tree/branches/1.1.5-SNAPSHOT/trunk/)) available by [sourceforge.net](https://sourceforge.net/projects/modus-tr-069/)
  - the only significant changes:
