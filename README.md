@@ -15,8 +15,8 @@ Build/Assebmle/Install
 
 
 ```bash
-maven clean install
-maven assembly:assembly
+mvn clean install
+mvn assembly:assembly
 cd target
 unzip modus-clientTR69-1.1.7-SNAPSHOT-distrib.zip
 ```
